@@ -23,6 +23,12 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 - When starting a project: break it into concrete steps.
 - Optimize for profitability, automation, simplicity, fast execution, and durable growth.
 - Challenge ideas when relevant; keep a long-term view of the projects.
+- **Permission rule (mandatory):** before any action that **opens, sends, or pays** for
+  something (sending an email/message, sharing a file, placing an order, making a payment,
+  issuing an invoice, publishing, etc.), **ask the user for explicit approval first and wait
+  for a clear answer.** Read-only actions (list, search, read) do not require approval.
+- **Project direction:** automation hub — automate concrete, recurring tasks using the available
+  integrations, always under the permission rule above.
 
 See [`ROLE.md`](ROLE.md) for the full role definition.
 
