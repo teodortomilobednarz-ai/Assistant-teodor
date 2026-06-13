@@ -1,0 +1,119 @@
+// Prisma schema for Copilote IA pour PME.
+// Auth.js (NextAuth) models + the app's own Task and Analysis models.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js models (database session strategy)
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts  Account[]
+  sessions  Session[]
+  tasks     Task[]
+  analyses  Analysis[]
+
+  createdAt DateTime @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Application models
+// ---------------------------------------------------------------------------
+
+enum TaskPriority {
+  haute
+  moyenne
+  basse
+}
+
+model Analysis {
+  id     String @id @default(cuid())
+  userId String
+
+  /// The source text that was analyzed (e.g. an email).
+  sourceText     String   @db.Text
+  question       String?  @db.Text
+  summary        String   @db.Text
+  keyPoints      String[]
+  suggestedReply String   @db.Text
+  answer         String?  @db.Text
+
+  tasks Task[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Task {
+  id         String       @id @default(cuid())
+  userId     String
+  analysisId String?
+
+  title    String
+  priority TaskPriority @default(moyenne)
+  /// Optional deadline as an ISO date string (YYYY-MM-DD).
+  dueDate  String?
+  done     Boolean      @default(false)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysis Analysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, done, createdAt])
+}

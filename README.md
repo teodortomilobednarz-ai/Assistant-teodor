@@ -4,35 +4,49 @@ L'assistant IA qui aide les dirigeants de PME et les indépendants : il **résum
 les emails, **prépare les réponses**, **crée les tâches** et **retrouve les
 informations**. Moteur : **Google Gemini** (palier gratuit).
 
-> **Statut : Étape 1 du MVP.** L'application analyse un texte collé (email ou
-> autre) et renvoie un résumé, des points clés, un brouillon de réponse et des
-> tâches. Les connexions Gmail, agenda et documents arrivent ensuite.
+> **Statut : Palier 1 (fondation).** Application multi-utilisateurs : comptes
+> (connexion Google), base de données, tableau de bord, et analyse de texte dont
+> les tâches/analyses sont **sauvegardées** par utilisateur. Les connexions Gmail,
+> agenda et documents arrivent aux paliers suivants.
 
 ## Stack
 
 - **Next.js 16** (App Router) + **React 19** + **TypeScript** (mode strict)
 - **Tailwind CSS 4**
+- **Auth.js (NextAuth v5)** — connexion Google, sessions en base
+- **Prisma 6 + PostgreSQL** — persistance
 - **SDK Google Gen AI** (`@google/genai`) — modèle `gemini-2.5-flash`, sorties
   structurées validées avec **Zod**
 
 ## Démarrer
 
-1. Installer les dépendances :
+1. Installer les dépendances (génère aussi le client Prisma) :
 
    ```bash
    npm install
    ```
 
-2. Configurer la clé API :
+2. Configurer l'environnement :
 
    ```bash
    cp .env.example .env.local
-   # puis renseigner GEMINI_API_KEY dans .env.local
    ```
 
-   Une clé gratuite se crée sur <https://aistudio.google.com/apikey>.
+   Renseigner dans `.env.local` :
+   - `GEMINI_API_KEY` — clé gratuite sur <https://aistudio.google.com/apikey>
+   - `DATABASE_URL` — base PostgreSQL gratuite sur <https://neon.tech>
+   - `AUTH_SECRET` — `openssl rand -base64 33`
+   - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — identifiants OAuth Google
+     (<https://console.cloud.google.com/apis/credentials>). URI de redirection
+     en dev : `http://localhost:3000/api/auth/callback/google`
 
-3. Lancer le serveur de développement :
+3. Créer les tables :
+
+   ```bash
+   npm run db:push
+   ```
+
+4. Lancer le serveur de développement :
 
    ```bash
    npm run dev
@@ -45,28 +59,37 @@ informations**. Moteur : **Google Gemini** (palier gratuit).
 | Commande            | Description                          |
 | ------------------- | ------------------------------------ |
 | `npm run dev`       | Serveur de développement             |
-| `npm run build`     | Build de production                  |
+| `npm run build`     | Build de production (Prisma + Next)  |
 | `npm run start`     | Serveur de production (après build)  |
 | `npm run lint`      | ESLint                               |
 | `npm run typecheck` | Vérification des types (`tsc`)       |
+| `npm run db:push`   | Synchronise le schéma avec la base   |
+| `npm run db:studio` | Explorateur de base Prisma Studio    |
 
 ## Structure
 
 ```
 .
 ├── app/
-│   ├── api/analyze/route.ts   # Endpoint POST : texte → analyse
-│   ├── layout.tsx             # Layout racine (fr)
-│   ├── page.tsx               # Page d'accueil
-│   └── globals.css            # Design tokens + Tailwind
-├── components/copilot/        # Interface (formulaire, résultats, badges)
+│   ├── page.tsx                   # Accueil public (connexion)
+│   ├── dashboard/                 # Espace protégé
+│   │   ├── layout.tsx             # Garde d'authentification + navigation
+│   │   ├── page.tsx               # Copilote (analyse)
+│   │   └── tasks/page.tsx         # Tâches sauvegardées
+│   ├── api/
+│   │   ├── analyze/route.ts       # Analyse + persistance
+│   │   └── auth/[...nextauth]/    # Routes Auth.js
+│   ├── layout.tsx · globals.css   # Layout racine + design tokens
+├── auth.ts                        # Configuration Auth.js
+├── components/                    # UI (copilot, auth)
 ├── lib/
-│   ├── gemini.ts              # Client Google Gemini (singleton)
-│   ├── copilot.ts             # Logique cœur : appel Gemini + sortie structurée
-│   ├── env.ts                 # Accès validé aux variables d'environnement
-│   └── schema.ts              # Schémas Zod + types partagés
-├── CLAUDE.md                  # Guide pour les assistants IA
-└── ROLE.md                    # Définition du rôle de l'assistant
+│   ├── gemini.ts                  # Client Google Gemini
+│   ├── copilot.ts                 # Appel Gemini + sortie structurée
+│   ├── prisma.ts                  # Client Prisma (singleton)
+│   ├── env.ts · schema.ts         # Env validé + schémas Zod
+│   └── actions/                   # Server actions (auth, tâches)
+├── prisma/schema.prisma           # Modèles de données
+├── CLAUDE.md · ROLE.md            # Guides assistant / rôle
 ```
 
 ## Principe de permission

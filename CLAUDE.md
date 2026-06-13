@@ -2,10 +2,10 @@
 
 This file gives guidance to AI assistants (Claude Code and others) working in this repository.
 
-> **Status: bootstrap / empty repository.** As of the last update, this repository contains
-> no application code — only this document. The sections below marked _(to be filled in)_ are
-> scaffolding. Update them as soon as real code, tooling, and workflows land, and remove this
-> banner once the project has a working structure.
+> **Status: Milestone 1 (foundation) built.** The repository contains a working Next.js
+> application: Google sign-in (Auth.js), a PostgreSQL database (Prisma), a protected dashboard,
+> and an AI text-analysis feature (Google Gemini) whose tasks and analyses are persisted per
+> user. Gmail / Calendar / Drive integrations are planned for the next milestones.
 
 ## Project
 
@@ -40,29 +40,43 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 
 ## Repository structure
 
-The repository currently has no source tree. When code is added, document the layout here, for example:
-
 ```
 .
-├── CLAUDE.md          # This file — guidance for AI assistants
-├── README.md          # (to be added) human-facing project overview
-└── src/               # (to be added) application source
+├── app/
+│   ├── page.tsx                   # Public landing page (sign-in)
+│   ├── dashboard/                 # Protected area (auth guard in layout.tsx)
+│   │   ├── page.tsx               # Copilot (text analysis)
+│   │   └── tasks/page.tsx         # Persisted tasks
+│   ├── api/analyze/route.ts       # Analyze endpoint (+ persistence)
+│   ├── api/auth/[...nextauth]/    # Auth.js routes
+│   └── layout.tsx · globals.css   # Root layout + design tokens
+├── auth.ts                        # Auth.js (NextAuth v5) configuration
+├── components/                    # UI: copilot/, auth/
+├── lib/
+│   ├── gemini.ts · copilot.ts     # AI engine (Gemini) + core logic
+│   ├── prisma.ts                  # Prisma client singleton
+│   ├── env.ts · schema.ts         # Validated env + Zod schemas
+│   └── actions/                   # Server actions (auth, tasks)
+├── prisma/schema.prisma           # Database models
+├── types/next-auth.d.ts           # Session type augmentation
+├── CLAUDE.md · ROLE.md · README.md
 ```
 
-Keep this map accurate as directories are created — it is the first thing an assistant reads to
+Keep this map accurate as the structure evolves — it is the first thing an assistant reads to
 orient itself.
 
 ## Development workflow
 
-_(to be filled in once tooling exists.)_ Document here, as they are introduced:
+- **Setup:** `npm install` (runs `prisma generate`). Copy `.env.example` to `.env.local` and fill
+  in `GEMINI_API_KEY`, `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`.
+- **Database:** `npm run db:push` to sync the schema; `npm run db:studio` to browse data.
+- **Run:** `npm run dev` → <http://localhost:3000>.
+- **Build:** `npm run build` (runs `prisma generate` then `next build`).
+- **Checks before committing:** `npm run typecheck`, `npm run lint`, and `npm run build` should all
+  pass. There is no automated test suite yet.
 
-- **Setup:** how to install dependencies and prepare a working environment.
-- **Build:** the command(s) to build the project.
-- **Run:** how to start the app locally.
-- **Test:** how to run the test suite (and how to run a single test).
-- **Lint / format:** the linter and formatter commands, and any pre-commit expectations.
-
-Until these exist, there is nothing to build, run, or test.
+The AI provider is intentionally isolated in `lib/copilot.ts` + `lib/gemini.ts`, so the engine can
+be swapped in one place.
 
 ## Git & branch conventions
 
