@@ -25,7 +25,14 @@ function Section({
   );
 }
 
-export function AnalysisResults({ analysis }: { analysis: Analysis }) {
+export function AnalysisResults({
+  analysis,
+  hideReply = false,
+}: {
+  analysis: Analysis;
+  /** Hide the draft-reply section (used where an editable reply is shown separately). */
+  hideReply?: boolean;
+}) {
   const { summary, keyPoints, suggestedReply, tasks, answer } = analysis;
 
   return (
@@ -53,14 +60,16 @@ export function AnalysisResults({ analysis }: { analysis: Analysis }) {
         </Section>
       )}
 
-      <Section
-        title="Brouillon de réponse"
-        action={<CopyButton value={suggestedReply} />}
-      >
-        <p className="whitespace-pre-wrap rounded-lg bg-surface-muted p-4 text-sm leading-relaxed">
-          {suggestedReply}
-        </p>
-      </Section>
+      {!hideReply && (
+        <Section
+          title="Brouillon de réponse"
+          action={<CopyButton value={suggestedReply} />}
+        >
+          <p className="whitespace-pre-wrap rounded-lg bg-surface-muted p-4 text-sm leading-relaxed">
+            {suggestedReply}
+          </p>
+        </Section>
+      )}
 
       <Section title={`Tâches${tasks.length ? ` (${tasks.length})` : ""}`}>
         {tasks.length === 0 ? (

@@ -1,0 +1,198 @@
+import "server-only";
+
+/**
+ * Minimal Gmail REST client (uses fetch with a user access token).
+ *
+ * Scope: read messages and create drafts. It never sends — creating a draft is
+ * deliberate, leaving the user in control of sending.
+ */
+
+const GMAIL_API = "https://gmail.googleapis.com/gmail/v1/users/me";
+
+export interface GmailSummary {
+  id: string;
+  threadId: string;
+  from: string;
+  subject: string;
+  date: string;
+  snippet: string;
+}
+
+export interface GmailMessage {
+  id: string;
+  threadId: string;
+  from: string;
+  to: string;
+  subject: string;
+  date: string;
+  body: string;
+}
+
+interface GmailHeader {
+  name: string;
+  value: string;
+}
+
+interface GmailPayload {
+  mimeType?: string;
+  headers?: GmailHeader[];
+  body?: { data?: string };
+  parts?: GmailPayload[];
+}
+
+interface GmailMessageResource {
+  id: string;
+  threadId: string;
+  snippet?: string;
+  payload?: GmailPayload;
+}
+
+function header(headers: GmailHeader[] | undefined, name: string): string {
+  const found = headers?.find(
+    (h) => h.name.toLowerCase() === name.toLowerCase(),
+  );
+  return found?.value ?? "";
+}
+
+function decodeBase64Url(data: string): string {
+  return Buffer.from(
+    data.replace(/-/g, "+").replace(/_/g, "/"),
+    "base64",
+  ).toString("utf8");
+}
+
+function encodeBase64Url(text: string): string {
+  return Buffer.from(text, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+/** Recursively extracts a readable text body from a Gmail payload. */
+function extractBody(payload: GmailPayload | undefined): string {
+  if (!payload) return "";
+
+  if (payload.mimeType === "text/plain" && payload.body?.data) {
+    return decodeBase64Url(payload.body.data);
+  }
+
+  if (payload.parts) {
+    // Prefer a text/plain part, then fall back to stripped HTML.
+    const plain = payload.parts.find((p) => p.mimeType === "text/plain");
+    if (plain?.body?.data) return decodeBase64Url(plain.body.data);
+
+    for (const part of payload.parts) {
+      const nested = extractBody(part);
+      if (nested) return nested;
+    }
+
+    const html = payload.parts.find((p) => p.mimeType === "text/html");
+    if (html?.body?.data) {
+      return decodeBase64Url(html.body.data).replace(/<[^>]+>/g, " ");
+    }
+  }
+
+  if (payload.body?.data) {
+    return decodeBase64Url(payload.body.data);
+  }
+
+  return "";
+}
+
+async function gmailFetch<T>(
+  accessToken: string,
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
+  const response = await fetch(`${GMAIL_API}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      ...init?.headers,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`Gmail API error ${response.status}: ${detail}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+export async function listRecentMessages(
+  accessToken: string,
+  maxResults = 12,
+): Promise<GmailSummary[]> {
+  const list = await gmailFetch<{ messages?: { id: string }[] }>(
+    accessToken,
+    `/messages?maxResults=${maxResults}&q=in:inbox`,
+  );
+
+  if (!list.messages?.length) return [];
+
+  return Promise.all(
+    list.messages.map(async ({ id }) => {
+      const msg = await gmailFetch<GmailMessageResource>(
+        accessToken,
+        `/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`,
+      );
+      return {
+        id: msg.id,
+        threadId: msg.threadId,
+        from: header(msg.payload?.headers, "From"),
+        subject: header(msg.payload?.headers, "Subject"),
+        date: header(msg.payload?.headers, "Date"),
+        snippet: msg.snippet ?? "",
+      };
+    }),
+  );
+}
+
+export async function getMessage(
+  accessToken: string,
+  id: string,
+): Promise<GmailMessage> {
+  const msg = await gmailFetch<GmailMessageResource>(
+    accessToken,
+    `/messages/${id}?format=full`,
+  );
+
+  return {
+    id: msg.id,
+    threadId: msg.threadId,
+    from: header(msg.payload?.headers, "From"),
+    to: header(msg.payload?.headers, "To"),
+    subject: header(msg.payload?.headers, "Subject"),
+    date: header(msg.payload?.headers, "Date"),
+    body: extractBody(msg.payload).trim() || (msg.snippet ?? ""),
+  };
+}
+
+export async function createDraft(
+  accessToken: string,
+  draft: { to: string; subject: string; body: string; threadId?: string },
+): Promise<{ id: string }> {
+  const mime = [
+    `To: ${draft.to}`,
+    `Subject: ${draft.subject}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    "",
+    draft.body,
+  ].join("\r\n");
+
+  const result = await gmailFetch<{ id: string }>(accessToken, "/drafts", {
+    method: "POST",
+    body: JSON.stringify({
+      message: {
+        raw: encodeBase64Url(mime),
+        ...(draft.threadId ? { threadId: draft.threadId } : {}),
+      },
+    }),
+  });
+
+  return { id: result.id };
+}

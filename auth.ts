@@ -19,10 +19,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       authorization: {
         params: {
-          // Request offline access so we receive a refresh token, which later
-          // milestones need to call Google APIs on the user's behalf.
+          // Request offline access so we receive a refresh token, needed to
+          // call Google APIs on the user's behalf. `gmail.modify` covers
+          // reading messages and creating drafts (never sending).
           access_type: "offline",
           prompt: "consent",
+          scope: [
+            "openid",
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/gmail.modify",
+          ].join(" "),
         },
       },
     }),
