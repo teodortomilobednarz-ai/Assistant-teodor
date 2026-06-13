@@ -30,8 +30,9 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 - **Project direction:** build a **SaaS — an "AI copilot for SMEs"** (AI assistant for small-
   business owners / independents). It connects to the customer's **email, calendar, and
   documents**, and the AI **summarizes**, **drafts replies**, **creates tasks**, and **retrieves
-  information**. AI engine: **Claude**. The assistant writes the code; the owner pilots
-  product/marketing/customers. (Direction locked 2026-06-13 — no more pivots.)
+  information**. AI engine: **Google Gemini** (free tier; chosen 2026-06-13 to keep costs at
+  zero while building). The assistant writes the code; the owner pilots product/marketing/
+  customers. (Direction locked 2026-06-13 — no more pivots.)
 - **Coding rule (mandatory):** **always enter plan mode (`/plan`) before writing code** — present
   a plan, get explicit approval, then implement.
 

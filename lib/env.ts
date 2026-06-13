@@ -4,20 +4,20 @@ import "server-only";
  * Server-side environment access.
  *
  * Reads are validated lazily (at call time) rather than at module load so the
- * app can still build and render pages that don't need the Anthropic API.
+ * app can still build and render pages that don't need the AI provider.
  */
 export interface ServerEnv {
-  readonly anthropicApiKey: string;
+  readonly geminiApiKey: string;
 }
 
 export function getServerEnv(): ServerEnv {
-  const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  if (!anthropicApiKey) {
+  if (!geminiApiKey) {
     throw new Error(
-      "ANTHROPIC_API_KEY is not set. Copy .env.example to .env.local and add your Anthropic API key.",
+      "GEMINI_API_KEY is not set. Copy .env.example to .env.local and add your Google Gemini API key.",
     );
   }
 
-  return { anthropicApiKey };
+  return { geminiApiKey };
 }

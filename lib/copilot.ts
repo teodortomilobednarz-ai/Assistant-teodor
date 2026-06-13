@@ -1,8 +1,8 @@
 import "server-only";
 
-import type Anthropic from "@anthropic-ai/sdk";
+import { Type, type Schema } from "@google/genai";
 
-import { getAnthropicClient } from "./anthropic";
+import { getGeminiClient } from "./gemini";
 import { analysisSchema, type AnalyzeRequest, type Analysis } from "./schema";
 
 /**
@@ -10,39 +10,42 @@ import { analysisSchema, type AnalyzeRequest, type Analysis } from "./schema";
  * structured analysis — summary, key points, a draft reply, extracted tasks,
  * and an optional answer to a user question.
  *
- * The model is constrained with a JSON schema (structured outputs) and its
- * response is re-validated with Zod, so callers always receive a well-formed
+ * The model is constrained with a response schema (structured output) and its
+ * JSON is re-validated with Zod, so callers always receive a well-formed
  * {@link Analysis} or a thrown error.
+ *
+ * The provider is intentionally isolated here: swapping Gemini for another LLM
+ * means changing only this module and {@link getGeminiClient}.
  */
 
-const MODEL = "claude-opus-4-8";
-const MAX_TOKENS = 8_000;
+/** Free-tier eligible Gemini model. */
+const MODEL = "gemini-2.5-flash";
 
-/** JSON schema handed to the model via `output_config.format`. */
-const RESPONSE_JSON_SCHEMA = {
-  type: "object",
+/** Response schema handed to the model via `config.responseSchema`. */
+const RESPONSE_SCHEMA: Schema = {
+  type: Type.OBJECT,
   properties: {
-    summary: { type: "string" },
-    keyPoints: { type: "array", items: { type: "string" } },
-    suggestedReply: { type: "string" },
+    summary: { type: Type.STRING },
+    keyPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+    suggestedReply: { type: Type.STRING },
     tasks: {
-      type: "array",
+      type: Type.ARRAY,
       items: {
-        type: "object",
+        type: Type.OBJECT,
         properties: {
-          title: { type: "string" },
-          priority: { type: "string", enum: ["haute", "moyenne", "basse"] },
-          dueDate: { type: ["string", "null"] },
+          title: { type: Type.STRING },
+          priority: { type: Type.STRING, enum: ["haute", "moyenne", "basse"] },
+          dueDate: { type: Type.STRING, nullable: true },
         },
         required: ["title", "priority", "dueDate"],
-        additionalProperties: false,
+        propertyOrdering: ["title", "priority", "dueDate"],
       },
     },
-    answer: { type: ["string", "null"] },
+    answer: { type: Type.STRING, nullable: true },
   },
   required: ["summary", "keyPoints", "suggestedReply", "tasks", "answer"],
-  additionalProperties: false,
-} as const;
+  propertyOrdering: ["summary", "keyPoints", "suggestedReply", "tasks", "answer"],
+};
 
 const SYSTEM_PROMPT = `Tu es un copilote IA pour dirigeants de PME et indépendants.
 À partir d'un texte fourni (le plus souvent un email reçu), tu produis une analyse claire et directement exploitable.
@@ -57,18 +60,8 @@ Règles :
 
 Tu ne fais que préparer et proposer : tu n'envoies rien et ne prends aucune action externe.`;
 
-/** Extracts the concatenated text content from a model response. */
-function extractText(message: Anthropic.Message): string {
-  return message.content
-    .filter(
-      (block): block is Anthropic.TextBlock => block.type === "text",
-    )
-    .map((block) => block.text)
-    .join("");
-}
-
 export async function analyzeContent(input: AnalyzeRequest): Promise<Analysis> {
-  const client = getAnthropicClient();
+  const client = getGeminiClient();
 
   const question = input.question?.trim();
   const userPrompt = [
@@ -82,24 +75,19 @@ export async function analyzeContent(input: AnalyzeRequest): Promise<Analysis> {
     '"""',
   ].join("\n");
 
-  const message = await client.messages.create({
+  const response = await client.models.generateContent({
     model: MODEL,
-    max_tokens: MAX_TOKENS,
-    thinking: { type: "adaptive" },
-    output_config: {
-      effort: "medium",
-      format: { type: "json_schema", schema: RESPONSE_JSON_SCHEMA },
+    contents: userPrompt,
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
+      responseMimeType: "application/json",
+      responseSchema: RESPONSE_SCHEMA,
+      temperature: 0.4,
     },
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userPrompt }],
   });
 
-  if (message.stop_reason === "refusal") {
-    throw new Error("La demande a été refusée par le modèle.");
-  }
-
-  const raw = extractText(message);
-  if (!raw.trim()) {
+  const raw = response.text;
+  if (!raw || !raw.trim()) {
     throw new Error("Réponse vide du modèle.");
   }
 

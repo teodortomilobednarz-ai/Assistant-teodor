@@ -64,8 +64,9 @@ client, puis l'IA :
 - **crée les tâches** automatiquement,
 - **retrouve les informations** dans les outils connectés.
 
-Moteur IA : **Claude**. Teodor ne code pas lui-même : l'assistant écrit le code, Teodor pilote
-produit / marketing / clients.
+Moteur IA : **Google Gemini** (palier gratuit, choisi le 2026-06-13 pour démarrer à coût zéro).
+Teodor ne code pas lui-même : l'assistant écrit le code, Teodor pilote produit / marketing /
+clients.
 
 > Décision arrêtée le 2026-06-13 après exploration de plusieurs pistes. On ne pivote plus :
 > on exécute ce produit.

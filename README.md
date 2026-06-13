@@ -2,7 +2,7 @@
 
 L'assistant IA qui aide les dirigeants de PME et les indépendants : il **résume**
 les emails, **prépare les réponses**, **crée les tâches** et **retrouve les
-informations**. Moteur : **Claude** (Anthropic).
+informations**. Moteur : **Google Gemini** (palier gratuit).
 
 > **Statut : Étape 1 du MVP.** L'application analyse un texte collé (email ou
 > autre) et renvoie un résumé, des points clés, un brouillon de réponse et des
@@ -12,7 +12,7 @@ informations**. Moteur : **Claude** (Anthropic).
 
 - **Next.js 16** (App Router) + **React 19** + **TypeScript** (mode strict)
 - **Tailwind CSS 4**
-- **SDK Anthropic** (`@anthropic-ai/sdk`) — modèle `claude-opus-4-8`, sorties
+- **SDK Google Gen AI** (`@google/genai`) — modèle `gemini-2.5-flash`, sorties
   structurées validées avec **Zod**
 
 ## Démarrer
@@ -27,10 +27,10 @@ informations**. Moteur : **Claude** (Anthropic).
 
    ```bash
    cp .env.example .env.local
-   # puis renseigner ANTHROPIC_API_KEY dans .env.local
+   # puis renseigner GEMINI_API_KEY dans .env.local
    ```
 
-   Une clé se crée sur <https://console.anthropic.com/settings/keys>.
+   Une clé gratuite se crée sur <https://aistudio.google.com/apikey>.
 
 3. Lancer le serveur de développement :
 
@@ -61,8 +61,8 @@ informations**. Moteur : **Claude** (Anthropic).
 │   └── globals.css            # Design tokens + Tailwind
 ├── components/copilot/        # Interface (formulaire, résultats, badges)
 ├── lib/
-│   ├── anthropic.ts           # Client Anthropic (singleton)
-│   ├── copilot.ts             # Logique cœur : appel Claude + sortie structurée
+│   ├── gemini.ts              # Client Google Gemini (singleton)
+│   ├── copilot.ts             # Logique cœur : appel Gemini + sortie structurée
 │   ├── env.ts                 # Accès validé aux variables d'environnement
 │   └── schema.ts              # Schémas Zod + types partagés
 ├── CLAUDE.md                  # Guide pour les assistants IA

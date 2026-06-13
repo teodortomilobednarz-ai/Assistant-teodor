@@ -37,7 +37,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error("[api/analyze] analysis failed:", error);
 
     const isMisconfigured =
-      error instanceof Error && error.message.includes("ANTHROPIC_API_KEY");
+      error instanceof Error && error.message.includes("GEMINI_API_KEY");
 
     return NextResponse.json(
       {
