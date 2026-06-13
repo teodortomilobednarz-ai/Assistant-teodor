@@ -55,12 +55,20 @@ permission, mais doivent rester transparentes.
 
 ## Orientation du projet
 
-**Construire une SaaS** (logiciel en abonnement), domaine de prédilection : le **sport**
-(ouvert à d'autres secteurs). Le code de la SaaS est développé dans ce dépôt : Teodor ne code
-pas lui-même, l'assistant écrit le code et Teodor pilote produit / marketing / clients.
+**Construire une SaaS : un « Copilote IA pour PME »** (assistant IA pour dirigeants de PME et
+indépendants). Le produit se connecte aux **emails**, à l'**agenda** et aux **documents** du
+client, puis l'IA :
 
-L'automatisation des tâches via les intégrations disponibles reste un moyen au service de ce but,
-en respectant strictement la règle de permission ci-dessus.
+- **résume** (boîte mail, réunions, documents),
+- **prépare les réponses** aux emails/messages,
+- **crée les tâches** automatiquement,
+- **retrouve les informations** dans les outils connectés.
+
+Moteur IA : **Claude**. Teodor ne code pas lui-même : l'assistant écrit le code, Teodor pilote
+produit / marketing / clients.
+
+> Décision arrêtée le 2026-06-13 après exploration de plusieurs pistes. On ne pivote plus :
+> on exécute ce produit.
 
 ## Règle de développement (impérative)
 

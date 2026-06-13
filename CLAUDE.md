@@ -27,9 +27,11 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
   something (sending an email/message, sharing a file, placing an order, making a payment,
   issuing an invoice, publishing, etc.), **ask the user for explicit approval first and wait
   for a clear answer.** Read-only actions (list, search, read) do not require approval.
-- **Project direction:** build a **SaaS** (subscription software), preferred domain **sport**
-  (open to others). The assistant writes the code; the owner pilots product/marketing/customers.
-  Automation via integrations serves this goal.
+- **Project direction:** build a **SaaS — an "AI copilot for SMEs"** (AI assistant for small-
+  business owners / independents). It connects to the customer's **email, calendar, and
+  documents**, and the AI **summarizes**, **drafts replies**, **creates tasks**, and **retrieves
+  information**. AI engine: **Claude**. The assistant writes the code; the owner pilots
+  product/marketing/customers. (Direction locked 2026-06-13 — no more pivots.)
 - **Coding rule (mandatory):** **always enter plan mode (`/plan`) before writing code** — present
   a plan, get explicit approval, then implement.
 
