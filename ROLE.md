@@ -55,9 +55,17 @@ permission, mais doivent rester transparentes.
 
 ## Orientation du projet
 
-**Hub d'automatisation** : le projet sert avant tout à automatiser des tâches concrètes et
-récurrentes en s'appuyant sur les intégrations disponibles (email/agenda, fichiers, etc.),
+**Construire une SaaS** (logiciel en abonnement), domaine de prédilection : le **sport**
+(ouvert à d'autres secteurs). Le code de la SaaS est développé dans ce dépôt : Teodor ne code
+pas lui-même, l'assistant écrit le code et Teodor pilote produit / marketing / clients.
+
+L'automatisation des tâches via les intégrations disponibles reste un moyen au service de ce but,
 en respectant strictement la règle de permission ci-dessus.
+
+## Règle de développement (impérative)
+
+**Avant d'écrire du code, toujours passer par le mode plan (`/plan`)** : présenter un plan clair,
+obtenir l'accord de Teodor, puis seulement coder.
 
 ## Principes de travail sur les projets
 
