@@ -1,5 +1,7 @@
 import { auth } from "@/auth";
 import { PriorityBadge } from "@/components/copilot/priority-badge";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { ChecksIcon } from "@/components/icons";
 import { deleteTask, setTaskDone } from "@/lib/actions/tasks";
 import { prisma } from "@/lib/prisma";
 
@@ -16,25 +18,31 @@ export default async function TasksPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Tâches</h1>
-        <p className="text-sm text-muted">
-          {openCount > 0
+      <PageHeader
+        icon={ChecksIcon}
+        title="Tâches"
+        description={
+          openCount > 0
             ? `${openCount} tâche${openCount > 1 ? "s" : ""} à faire.`
-            : "Aucune tâche en cours."}
-        </p>
-      </div>
+            : "Aucune tâche en cours."
+        }
+      />
 
       {tasks.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border bg-surface/50 p-8 text-center text-sm text-muted">
-          Les tâches détectées lors d&apos;une analyse apparaîtront ici.
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-surface/50 p-10 text-center">
+          <span className="bg-accent-soft flex size-12 items-center justify-center rounded-2xl text-accent">
+            <ChecksIcon className="size-6" />
+          </span>
+          <p className="text-sm text-muted">
+            Les tâches détectées lors d&apos;une analyse apparaîtront ici.
+          </p>
         </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {tasks.map((task) => (
             <li
               key={task.id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-colors hover:border-accent/40"
             >
               <div className="flex min-w-0 flex-col gap-1">
                 <span

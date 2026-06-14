@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { CreateEventForm } from "@/components/copilot/create-event-form";
 import { DaySummary } from "@/components/copilot/day-summary";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { CalendarIcon } from "@/components/icons";
 import { listUpcomingEvents, type CalendarEvent } from "@/lib/calendar";
 import { getValidGoogleAccessToken } from "@/lib/google";
 
@@ -46,12 +48,11 @@ export default async function AgendaPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Agenda</h1>
-        <p className="text-sm text-muted">
-          Vos prochains rendez-vous, un résumé, et la création d&apos;événements.
-        </p>
-      </div>
+      <PageHeader
+        icon={CalendarIcon}
+        title="Agenda"
+        description="Vos prochains rendez-vous, un résumé, et la création d'événements."
+      />
 
       {errorMessage ? (
         <div className="rounded-xl border border-border bg-surface p-6 text-sm text-muted">
