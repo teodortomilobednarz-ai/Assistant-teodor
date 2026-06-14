@@ -2,6 +2,8 @@
 
 import { useActionState, useState } from "react";
 
+import { SparklesIcon } from "@/components/icons";
+import { Spinner } from "@/components/ui/spinner";
 import { createDraftAction, type DraftActionState } from "@/lib/actions/gmail";
 import type { Analysis } from "@/lib/schema";
 
@@ -64,7 +66,7 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <article className="animate-fade-up rounded-2xl border border-border bg-surface p-5 shadow-sm">
         <h2 className="text-lg font-semibold">{email.subject || "(sans objet)"}</h2>
         <p className="mt-1 text-sm text-muted">{email.from}</p>
         <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed">
@@ -77,9 +79,19 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
           type="button"
           onClick={analyze}
           disabled={isLoading}
-          className="inline-flex w-fit items-center justify-center rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover disabled:opacity-50"
+          className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-all hover:bg-accent-hover hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
         >
-          {isLoading ? "Analyse en cours…" : "Analyser et préparer une réponse"}
+          {isLoading ? (
+            <>
+              <Spinner className="size-4" />
+              Analyse en cours…
+            </>
+          ) : (
+            <>
+              <SparklesIcon className="size-4" />
+              Analyser et préparer une réponse
+            </>
+          )}
         </button>
       )}
 
@@ -115,8 +127,9 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
               <button
                 type="submit"
                 disabled={draftPending || !reply.trim()}
-                className="inline-flex items-center justify-center rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
+                {draftPending && <Spinner className="size-4" />}
                 {draftPending ? "Création…" : "Créer le brouillon dans Gmail"}
               </button>
               {draftState.message && (
