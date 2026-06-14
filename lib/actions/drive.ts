@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { summarize } from "@/lib/copilot";
 import { getDocumentText, searchFiles, type DriveFile } from "@/lib/drive";
-import { getValidGoogleAccessToken } from "@/lib/google";
+import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 async function requireToken(): Promise<string> {
   const session = await auth();
@@ -30,13 +30,11 @@ export async function searchDrive(query: string): Promise<DriveSearchResult> {
     return { ok: true, files };
   } catch (error) {
     console.error("[searchDrive] failed:", error);
-    const code = error instanceof Error ? error.message : "";
-    const reconnect = code === "NO_GOOGLE_ACCOUNT" || code === "NO_REFRESH_TOKEN";
     return {
       ok: false,
       files: [],
-      error: reconnect
-        ? "Reconnecte ton compte Google pour autoriser Drive."
+      error: isReconnectError(error)
+        ? "Reconnecte-toi avec Google (déconnexion → reconnexion) pour autoriser Drive."
         : "Recherche impossible pour le moment.",
     };
   }

@@ -42,6 +42,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/",
   },
   callbacks: {
+    // Auth.js does NOT refresh stored OAuth tokens on re-login for an existing
+    // account, so newly-added scopes (Calendar, Drive) never reach the DB and
+    // API calls 403. Persist the latest tokens + scope on every sign-in so a
+    // single clean reconnection grants everything.
+    async signIn({ account }) {
+      if (account?.provider === "google" && account.providerAccountId) {
+        await prisma.account.updateMany({
+          where: {
+            provider: "google",
+            providerAccountId: account.providerAccountId,
+          },
+          data: {
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            scope: account.scope,
+            id_token: account.id_token,
+            token_type: account.token_type,
+            ...(account.refresh_token
+              ? { refresh_token: account.refresh_token }
+              : {}),
+          },
+        });
+      }
+      return true;
+    },
     // Expose the database user id on the session so server code can scope
     // queries (tasks, analyses) to the authenticated user.
     session({ session, user }) {

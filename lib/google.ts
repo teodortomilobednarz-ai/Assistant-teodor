@@ -3,6 +3,20 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 
 /**
+ * True when the failure means the user must (re)connect Google or grant more
+ * scopes — no Google account, no refresh token, or an insufficient-scope 403.
+ */
+export function isReconnectError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : "";
+  return (
+    message === "NO_GOOGLE_ACCOUNT" ||
+    message === "NO_REFRESH_TOKEN" ||
+    message.includes("error 403") ||
+    message.toLowerCase().includes("insufficient")
+  );
+}
+
+/**
  * Returns a valid Google OAuth access token for the given user, refreshing it
  * via the stored refresh token when it is missing or about to expire.
  *

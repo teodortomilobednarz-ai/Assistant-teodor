@@ -4,7 +4,7 @@ import { DaySummary } from "@/components/copilot/day-summary";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { CalendarIcon } from "@/components/icons";
 import { listUpcomingEvents, type CalendarEvent } from "@/lib/calendar";
-import { getValidGoogleAccessToken } from "@/lib/google";
+import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +39,9 @@ export default async function AgendaPage() {
     events = await listUpcomingEvents(accessToken);
   } catch (error) {
     console.error("[agenda] failed to load:", error);
-    const code = error instanceof Error ? error.message : "";
-    errorMessage =
-      code === "NO_GOOGLE_ACCOUNT" || code === "NO_REFRESH_TOKEN"
-        ? "Déconnecte-toi puis reconnecte-toi avec Google pour autoriser l'agenda."
-        : "Impossible de charger l'agenda pour le moment.";
+    errorMessage = isReconnectError(error)
+      ? "Reconnecte-toi avec Google (déconnexion → reconnexion) pour autoriser l'accès à ton agenda."
+      : "Impossible de charger l'agenda pour le moment.";
   }
 
   return (

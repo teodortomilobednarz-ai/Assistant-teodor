@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { listMessages, type GmailSummary } from "@/lib/gmail";
-import { getValidGoogleAccessToken } from "@/lib/google";
+import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 const FILTER_QUERIES: Record<string, string> = {
   all: "in:inbox",
@@ -61,13 +61,11 @@ export async function fetchInbox(
     };
   } catch (error) {
     console.error("[fetchInbox] failed:", error);
-    const code = error instanceof Error ? error.message : "";
-    const reconnect = code === "NO_GOOGLE_ACCOUNT" || code === "NO_REFRESH_TOKEN";
     return {
       ok: false,
       messages: [],
-      error: reconnect
-        ? "Reconnecte ton compte Google (déconnexion → reconnexion) pour accéder à Gmail."
+      error: isReconnectError(error)
+        ? "Reconnecte-toi avec Google (déconnexion → reconnexion) pour accéder à Gmail."
         : "Impossible de charger les emails pour le moment.",
     };
   }

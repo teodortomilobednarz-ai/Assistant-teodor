@@ -102,13 +102,6 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {!googleConnected && (
-        <div className="rounded-2xl border border-accent/30 bg-accent-soft/60 px-4 py-3 text-sm">
-          Reconnectez-vous avec Google (déconnexion → reconnexion) pour activer
-          les emails et l&apos;agenda.
-        </div>
-      )}
-
       {/* Stats */}
       <div className="animate-fade-up delay-1 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Mails non lus" value={unreadCount} icon={MailIcon} />

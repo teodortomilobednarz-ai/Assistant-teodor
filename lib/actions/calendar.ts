@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { createEvent, listUpcomingEvents } from "@/lib/calendar";
 import { summarize } from "@/lib/copilot";
-import { getValidGoogleAccessToken } from "@/lib/google";
+import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 export interface EventActionState {
   ok: boolean;
@@ -66,11 +66,10 @@ export async function createCalendarEvent(
     return { ok: true, message: "Événement créé dans Google Agenda." };
   } catch (error) {
     console.error("[createCalendarEvent] failed:", error);
-    const code = error instanceof Error ? error.message : "";
-    if (code === "NO_GOOGLE_ACCOUNT" || code === "NO_REFRESH_TOKEN") {
+    if (isReconnectError(error)) {
       return {
         ok: false,
-        message: "Reconnecte ton compte Google pour autoriser l'agenda.",
+        message: "Reconnecte-toi avec Google pour autoriser l'agenda.",
       };
     }
     return {

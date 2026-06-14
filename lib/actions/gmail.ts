@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { createDraft } from "@/lib/gmail";
-import { getValidGoogleAccessToken } from "@/lib/google";
+import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 export interface DraftActionState {
   ok: boolean;
@@ -44,11 +44,10 @@ export async function createDraftAction(
     return { ok: true, message: "Brouillon créé dans Gmail (non envoyé)." };
   } catch (error) {
     console.error("[createDraftAction] failed:", error);
-    const code = error instanceof Error ? error.message : "";
-    if (code === "NO_GOOGLE_ACCOUNT" || code === "NO_REFRESH_TOKEN") {
+    if (isReconnectError(error)) {
       return {
         ok: false,
-        message: "Reconnecte ton compte Google pour accéder à Gmail.",
+        message: "Reconnecte-toi avec Google pour accéder à Gmail.",
       };
     }
     return {
