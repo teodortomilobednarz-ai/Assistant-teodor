@@ -23,7 +23,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-20 border-b border-border bg-surface/85 backdrop-blur print:hidden">
+      <header className="glass sticky top-0 z-20 border-b border-border print:hidden">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-3">
           <div className="flex items-center gap-4">
             <LogoMark className="size-8" />

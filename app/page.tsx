@@ -69,7 +69,7 @@ export default async function LandingPage() {
   const cta = session?.user ? (
     <Link
       href="/dashboard"
-      className="bg-gradient-accent inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
+      className="bg-gradient-accent glow-hover inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm hover:-translate-y-0.5"
     >
       Ouvrir le tableau de bord
       <ArrowRightIcon className="size-4" />
@@ -81,7 +81,7 @@ export default async function LandingPage() {
   return (
     <div className="flex flex-1 flex-col">
       {/* Top bar */}
-      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur">
+      <header className="glass sticky top-0 z-20 border-b border-border/70">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3">
           <Logo />
           {session?.user ? (
@@ -107,8 +107,8 @@ export default async function LandingPage() {
           </span>
 
           <h1 className="animate-fade-up delay-1 mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
-            Gagnez <span className="text-gradient">des heures</span> chaque
-            semaine.
+            Gagnez <span className="text-gradient shimmer">des heures</span>{" "}
+            chaque semaine.
           </h1>
 
           <p className="animate-fade-up delay-2 mt-5 max-w-2xl text-lg leading-relaxed text-muted">
@@ -170,7 +170,7 @@ export default async function LandingPage() {
           {FEATURES.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="group rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              className="group card-glow glow-hover rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all hover:-translate-y-1"
             >
               <span className="bg-accent-soft inline-flex size-11 items-center justify-center rounded-xl text-accent transition-colors group-hover:bg-accent group-hover:text-white">
                 <Icon className="size-5" />
@@ -242,7 +242,7 @@ export default async function LandingPage() {
 /** A faux in-app preview to give the product a tangible feel. */
 function PreviewCard() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface text-left shadow-xl">
+    <div className="float card-glow overflow-hidden rounded-2xl border border-border bg-surface text-left shadow-xl">
       <div className="flex items-center gap-1.5 border-b border-border bg-surface-muted px-4 py-2.5">
         <span className="size-2.5 rounded-full bg-red-400" />
         <span className="size-2.5 rounded-full bg-amber-400" />

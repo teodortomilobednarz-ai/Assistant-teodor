@@ -49,7 +49,7 @@ function StatCard({
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <div className="glow-hover rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted">{label}</span>
         <span className="bg-accent-soft flex size-8 items-center justify-center rounded-lg text-accent">
@@ -94,7 +94,7 @@ export default async function DashboardPage() {
           <Link
             key={href}
             href={href}
-            className={`group animate-fade-up delay-${index + 1} rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-accent/40 hover:shadow-md`}
+            className={`group card-glow glow-hover animate-fade-up delay-${index + 1} rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-accent/40`}
           >
             <span className="bg-gradient-accent flex size-10 items-center justify-center rounded-xl text-white shadow-sm">
               <Icon className="size-5" />
