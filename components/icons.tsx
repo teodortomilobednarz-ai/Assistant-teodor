@@ -93,3 +93,12 @@ export function BoltIcon({ className = "size-5" }: IconProps) {
     </svg>
   );
 }
+
+export function ReceiptIcon({ className = "size-5" }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <path d="M6 3h12v18l-3-1.5L12 21l-3-1.5L6 21V3z" />
+      <path d="M9 8h6M9 12h6" />
+    </svg>
+  );
+}

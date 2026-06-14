@@ -8,6 +8,7 @@ import {
   ChecksIcon,
   FileIcon,
   MailIcon,
+  ReceiptIcon,
   SparklesIcon,
 } from "@/components/icons";
 
@@ -16,6 +17,7 @@ const LINKS = [
   { href: "/dashboard/inbox", label: "Boîte", icon: MailIcon },
   { href: "/dashboard/agenda", label: "Agenda", icon: CalendarIcon },
   { href: "/dashboard/docs", label: "Documents", icon: FileIcon },
+  { href: "/dashboard/billing", label: "Devis", icon: ReceiptIcon },
   { href: "/dashboard/tasks", label: "Tâches", icon: ChecksIcon },
 ];
 

@@ -23,7 +23,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-20 border-b border-border bg-surface/85 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-border bg-surface/85 backdrop-blur print:hidden">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-3">
           <div className="flex items-center gap-4">
             <LogoMark className="size-8" />
@@ -49,7 +49,7 @@ export default async function DashboardLayout({
       </header>
 
       <div className="relative flex flex-1 flex-col overflow-hidden">
-        <div className="aurora opacity-50" />
+        <div className="aurora opacity-50 print:hidden" />
         <div className="relative flex flex-1 flex-col">{children}</div>
       </div>
     </div>
