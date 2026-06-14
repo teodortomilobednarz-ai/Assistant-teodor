@@ -60,6 +60,13 @@ export function InboxBrowser({ initial }: InboxBrowserProps) {
 
   // A token to discard stale responses when the query changes mid-flight.
   const requestId = useRef(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // "Expéditeur" helper: prime the search with a `from:` operator and focus.
+  function searchBySender() {
+    setSearch((value) => (value.startsWith("from:") ? value : "from:"));
+    inputRef.current?.focus();
+  }
 
   const runQuery = useCallback(
     async (nextSearch: string, nextFilter: InboxFilter) => {
@@ -129,6 +136,7 @@ export function InboxBrowser({ initial }: InboxBrowserProps) {
       <div className="relative">
         <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted" />
         <input
+          ref={inputRef}
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -167,6 +175,17 @@ export function InboxBrowser({ initial }: InboxBrowserProps) {
             </button>
           );
         })}
+        <button
+          type="button"
+          onClick={searchBySender}
+          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+            search.startsWith("from:")
+              ? "border-accent/50 bg-accent-soft text-accent"
+              : "border-border bg-surface text-muted hover:text-foreground"
+          }`}
+        >
+          Expéditeur
+        </button>
       </div>
 
       {/* List */}
