@@ -107,7 +107,8 @@ export default async function LandingPage() {
           </span>
 
           <h1 className="animate-fade-up delay-1 mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
-            Gagnez <span className="text-gradient shimmer">des heures</span>{" "}
+            Gagnez{" "}
+            <span className="text-gradient glow-text shimmer">des heures</span>{" "}
             chaque semaine.
           </h1>
 
@@ -279,8 +280,9 @@ function PreviewCard() {
               </li>
             </ul>
           </div>
-          <div className="bg-gradient-accent rounded-xl px-4 py-3 text-sm font-medium text-white">
-            ✶ Brouillon de réponse prêt à envoyer
+          <div className="bg-gradient-accent flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white">
+            <SparklesIcon className="size-4" />
+            Brouillon de réponse prêt à envoyer
           </div>
         </div>
       </div>

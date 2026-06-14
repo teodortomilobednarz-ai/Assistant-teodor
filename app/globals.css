@@ -2,24 +2,25 @@
 
 /*
  * Design tokens — Draidly.
- * A dark, futuristic theme: near-black backdrop, neon indigo→violet→cyan
- * accents, glow, glass and motion. Components only ever read the tokens.
+ * Dark "OLED" theme per the ui-ux-pro-max design system: deep slate backdrop,
+ * high-contrast text (AAA), visible borders, neon violet→cyan accents, status
+ * colors, glow + glass + motion. Components only ever read the tokens.
  */
 :root {
-  --background: #07060f;
-  --surface: #100f1d;
-  --surface-muted: #191830;
-  --foreground: #ecedf6;
-  --muted: #9b9fc0;
-  --border: #262542;
+  --background: #030712;
+  --surface: #0e1626;
+  --surface-muted: #18223a;
+  --foreground: #f8fafc;
+  --muted: #98a2b8;
+  --border: #2b3650;
   --accent: #8b7dff;
   --accent-hover: #a394ff;
   --accent-foreground: #ffffff;
-  --accent-soft: #1d1b3a;
-  --success: #34d399;
-  --danger: #fb7185;
-  --danger-surface: #2a1320;
-  --danger-border: #4a2236;
+  --accent-soft: #1a1b39;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --danger-surface: #2a1414;
+  --danger-border: #4a2233;
 }
 
 @theme inline {
@@ -49,6 +50,22 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Accessible focus states (ui-ux-pro-max §1 Accessibility — CRITICAL). */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Subtle neon glow for hero headlines. */
+.glow-text {
+  filter: drop-shadow(0 0 18px rgba(139, 124, 255, 0.4));
 }
 
 /* Animated gradient text (hero headlines, wordmark). */
