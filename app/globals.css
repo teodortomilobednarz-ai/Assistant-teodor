@@ -20,6 +20,17 @@
   --danger: #fb7185;
   --danger-surface: #2a1320;
   --danger-border: #4a2236;
+
+  /* Priority scale — dark-theme friendly (token-driven, no hard-coded colors). */
+  --priority-high: #fb7185;
+  --priority-high-surface: #2a1320;
+  --priority-high-border: #4a2236;
+  --priority-medium: #fbbf24;
+  --priority-medium-surface: #2a2110;
+  --priority-medium-border: #4a3a1c;
+  --priority-low: #34d399;
+  --priority-low-surface: #0f2a22;
+  --priority-low-border: #1c4a3a;
 }
 
 @theme inline {
@@ -37,6 +48,15 @@
   --color-danger: var(--danger);
   --color-danger-surface: var(--danger-surface);
   --color-danger-border: var(--danger-border);
+  --color-priority-high: var(--priority-high);
+  --color-priority-high-surface: var(--priority-high-surface);
+  --color-priority-high-border: var(--priority-high-border);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-medium-surface: var(--priority-medium-surface);
+  --color-priority-medium-border: var(--priority-medium-border);
+  --color-priority-low: var(--priority-low);
+  --color-priority-low-surface: var(--priority-low-surface);
+  --color-priority-low-border: var(--priority-low-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -49,6 +69,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Visible keyboard focus everywhere — accessibility baseline. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Animated gradient text (hero headlines, wordmark). */
@@ -184,6 +211,32 @@ body {
   animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Exit motion — a completed/removed task collapses out of the list. */
+@keyframes task-leave {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 140px;
+  }
+  40% {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(28px);
+    max-height: 0;
+    margin-top: -8px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.animate-task-leave {
+  animation: task-leave 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  overflow: hidden;
+}
+
 .delay-1 {
   animation-delay: 0.08s;
 }
@@ -203,6 +256,10 @@ body {
   .shimmer,
   .float {
     animation: none;
+  }
+  /* Keep the collapse fast but skip the slide for reduced-motion users. */
+  .animate-task-leave {
+    animation-duration: 0.18s;
   }
 }
 

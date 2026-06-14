@@ -73,7 +73,7 @@ export function CreateEventForm() {
           </button>
           {state.message && (
             <span
-              className={`text-sm ${state.ok ? "text-emerald-600" : "text-danger"}`}
+              className={`text-sm ${state.ok ? "text-success" : "text-danger"}`}
             >
               {state.message}
             </span>

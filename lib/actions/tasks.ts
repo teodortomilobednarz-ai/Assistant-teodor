@@ -14,27 +14,35 @@ async function requireUserId(): Promise<string> {
   return userId;
 }
 
-export async function setTaskDone(formData: FormData): Promise<void> {
+/** Marks a task done (it then leaves the active list, into "Historique"). */
+export async function completeTask(taskId: string): Promise<void> {
   const userId = await requireUserId();
-  const taskId = String(formData.get("taskId") ?? "");
-  const done = formData.get("done") === "true";
-
   // Scoped by userId so a user can only ever mutate their own tasks.
   await prisma.task.updateMany({
     where: { id: taskId, userId },
-    data: { done },
+    data: { done: true },
   });
-
   revalidatePath("/dashboard/tasks");
+  revalidatePath("/dashboard");
 }
 
-export async function deleteTask(formData: FormData): Promise<void> {
+/** Re-opens a completed task (from the history back into the active list). */
+export async function reopenTask(taskId: string): Promise<void> {
   const userId = await requireUserId();
-  const taskId = String(formData.get("taskId") ?? "");
+  await prisma.task.updateMany({
+    where: { id: taskId, userId },
+    data: { done: false },
+  });
+  revalidatePath("/dashboard/tasks");
+  revalidatePath("/dashboard");
+}
 
+/** Permanently deletes a task. */
+export async function deleteTask(taskId: string): Promise<void> {
+  const userId = await requireUserId();
   await prisma.task.deleteMany({
     where: { id: taskId, userId },
   });
-
   revalidatePath("/dashboard/tasks");
+  revalidatePath("/dashboard");
 }

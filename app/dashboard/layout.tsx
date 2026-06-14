@@ -1,10 +1,11 @@
-import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
-import { SignOutButton } from "@/components/auth/sign-out-button";
-import { LogoMark } from "@/components/brand/logo";
-import { NavLinks } from "@/components/dashboard/nav-links";
+import {
+  DashboardSidebar,
+  MobileTopBar,
+  type SidebarUser,
+} from "@/components/dashboard/sidebar";
 
 export default async function DashboardLayout({
   children,
@@ -18,39 +19,22 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  const { name, email, image } = session.user;
-  const initial = (name ?? email ?? "?").charAt(0).toUpperCase();
+  const user: SidebarUser = {
+    name: session.user.name,
+    email: session.user.email,
+    image: session.user.image,
+  };
 
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="glass sticky top-0 z-20 border-b border-border print:hidden">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-3">
-          <div className="flex items-center gap-4">
-            <LogoMark className="size-8" />
-            <NavLinks />
-          </div>
-          <div className="flex items-center gap-3">
-            {image ? (
-              <Image
-                src={image}
-                alt=""
-                width={32}
-                height={32}
-                className="size-8 rounded-full border border-border object-cover"
-              />
-            ) : (
-              <span className="bg-accent-soft flex size-8 items-center justify-center rounded-full text-sm font-semibold text-accent">
-                {initial}
-              </span>
-            )}
-            <SignOutButton />
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-full flex-col lg:flex-row">
+      <DashboardSidebar user={user} />
 
-      <div className="relative flex flex-1 flex-col overflow-hidden">
-        <div className="aurora opacity-50 print:hidden" />
-        <div className="relative flex flex-1 flex-col">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileTopBar user={user} />
+        <div className="relative flex flex-1 flex-col overflow-hidden">
+          <div className="aurora opacity-40 print:hidden" />
+          <div className="relative flex flex-1 flex-col">{children}</div>
+        </div>
       </div>
     </div>
   );

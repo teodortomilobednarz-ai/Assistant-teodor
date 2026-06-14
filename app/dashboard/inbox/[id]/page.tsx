@@ -2,7 +2,11 @@ import Link from "next/link";
 
 import { auth } from "@/auth";
 import { EmailWorkspace } from "@/components/copilot/email-workspace";
-import { getMessage, type GmailMessage } from "@/lib/gmail";
+import {
+  getMessage,
+  markMessageRead,
+  type GmailMessage,
+} from "@/lib/gmail";
 import { getValidGoogleAccessToken } from "@/lib/google";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +26,8 @@ export default async function EmailPage({
   try {
     const accessToken = await getValidGoogleAccessToken(userId);
     email = await getMessage(accessToken, id);
+    // Opening an email marks it read (best-effort, never blocks the view).
+    void markMessageRead(accessToken, id).catch(() => {});
   } catch (error) {
     console.error("[inbox/email] failed to load:", error);
     errorMessage = "Impossible de charger cet email pour le moment.";

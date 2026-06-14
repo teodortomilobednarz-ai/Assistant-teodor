@@ -47,23 +47,24 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 ├── app/
 │   ├── page.tsx                   # Public landing page (sign-in)
 │   ├── dashboard/                 # Protected area (auth guard in layout.tsx)
-│   │   ├── page.tsx               # Copilot (text analysis)
-│   │   ├── inbox/                 # Gmail: list + email workspace (draft replies)
+│   │   ├── page.tsx               # Control-center dashboard (stats, AI summary, previews, copilot)
+│   │   ├── layout.tsx             # Responsive sidebar shell (desktop rail + mobile drawer)
+│   │   ├── inbox/                 # Gmail: search/filter/infinite-scroll browser + email workspace
 │   │   ├── agenda/page.tsx        # Calendar: events, day summary, create event
 │   │   ├── docs/page.tsx          # Drive: search + summarize Google Docs
-│   │   └── tasks/page.tsx         # Persisted tasks
+│   │   └── tasks/page.tsx         # Tasks: optimistic complete/delete (no strike-through) + history
 │   ├── api/analyze/route.ts       # Analyze endpoint (+ persistence)
 │   ├── api/auth/[...nextauth]/    # Auth.js routes
 │   └── layout.tsx · globals.css   # Root layout + design tokens
 ├── auth.ts                        # Auth.js (NextAuth v5) configuration
-├── components/                    # UI: copilot/, auth/
+├── components/                    # UI: brand/ (SVG logo), dashboard/ (sidebar), copilot/, auth/
 ├── lib/
 │   ├── gemini.ts · copilot.ts     # AI engine (Gemini) + core logic
 │   ├── google.ts                  # OAuth token refresh for Google APIs
-│   ├── gmail.ts · calendar.ts · drive.ts  # Google API clients
+│   ├── gmail.ts · calendar.ts · drive.ts  # Google API clients (Gmail: paginated search + read state)
 │   ├── prisma.ts                  # Prisma client singleton
 │   ├── env.ts · schema.ts         # Validated env + Zod schemas
-│   └── actions/                   # Server actions (auth, tasks, gmail, calendar, drive)
+│   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
 ├── CLAUDE.md · ROLE.md · README.md

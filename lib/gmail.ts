@@ -16,6 +16,12 @@ export interface GmailSummary {
   subject: string;
   date: string;
   snippet: string;
+  unread: boolean;
+}
+
+export interface GmailPage {
+  messages: GmailSummary[];
+  nextPageToken?: string;
 }
 
 export interface GmailMessage {
@@ -44,6 +50,7 @@ interface GmailMessageResource {
   id: string;
   threadId: string;
   snippet?: string;
+  labelIds?: string[];
   payload?: GmailPayload;
 }
 
@@ -123,18 +130,35 @@ async function gmailFetch<T>(
   return response.json() as Promise<T>;
 }
 
-export async function listRecentMessages(
+/**
+ * Lists messages for a Gmail search query, one page at a time.
+ *
+ * The query (`q`) is passed straight to Gmail, so anything the Gmail search box
+ * accepts works here — `is:unread`, `newer_than:7d`, `has:attachment`,
+ * `from:alice@x.com`, free text — and it searches the *entire* mailbox, so the
+ * user can surface emails from months ago instantly. Pagination is cursor-based
+ * via `pageToken` (Gmail's `nextPageToken`).
+ */
+export async function listMessages(
   accessToken: string,
-  maxResults = 12,
-): Promise<GmailSummary[]> {
-  const list = await gmailFetch<{ messages?: { id: string }[] }>(
-    accessToken,
-    `/messages?maxResults=${maxResults}&q=in:inbox`,
-  );
+  options: { q?: string; pageToken?: string; maxResults?: number } = {},
+): Promise<GmailPage> {
+  const params = new URLSearchParams({
+    maxResults: String(options.maxResults ?? 25),
+    q: options.q?.trim() || "in:inbox",
+  });
+  if (options.pageToken) params.set("pageToken", options.pageToken);
 
-  if (!list.messages?.length) return [];
+  const list = await gmailFetch<{
+    messages?: { id: string }[];
+    nextPageToken?: string;
+  }>(accessToken, `/messages?${params.toString()}`);
 
-  return Promise.all(
+  if (!list.messages?.length) {
+    return { messages: [], nextPageToken: list.nextPageToken };
+  }
+
+  const messages = await Promise.all(
     list.messages.map(async ({ id }) => {
       const msg = await gmailFetch<GmailMessageResource>(
         accessToken,
@@ -147,9 +171,36 @@ export async function listRecentMessages(
         subject: header(msg.payload?.headers, "Subject"),
         date: header(msg.payload?.headers, "Date"),
         snippet: msg.snippet ?? "",
+        unread: msg.labelIds?.includes("UNREAD") ?? false,
       };
     }),
   );
+
+  return { messages, nextPageToken: list.nextPageToken };
+}
+
+/** Estimated number of messages matching a query (e.g. unread in inbox). */
+export async function countMessages(
+  accessToken: string,
+  q: string,
+): Promise<number> {
+  const params = new URLSearchParams({ q, maxResults: "1" });
+  const data = await gmailFetch<{ resultSizeEstimate?: number }>(
+    accessToken,
+    `/messages?${params.toString()}`,
+  );
+  return data.resultSizeEstimate ?? 0;
+}
+
+/** Removes the UNREAD label so opening a message marks it as read. */
+export async function markMessageRead(
+  accessToken: string,
+  id: string,
+): Promise<void> {
+  await gmailFetch(accessToken, `/messages/${id}/modify`, {
+    method: "POST",
+    body: JSON.stringify({ removeLabelIds: ["UNREAD"] }),
+  });
 }
 
 export async function getMessage(

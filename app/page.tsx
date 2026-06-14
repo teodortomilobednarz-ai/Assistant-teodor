@@ -267,13 +267,13 @@ function PreviewCard() {
             <ul className="mt-2 flex flex-col gap-1.5 text-sm">
               <li className="flex items-center justify-between gap-2">
                 Envoyer le devis détaillé
-                <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
+                <span className="bg-priority-high-surface text-priority-high ring-priority-high-border rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset">
                   Haute
                 </span>
               </li>
               <li className="flex items-center justify-between gap-2">
                 Caler la réunion (sem. 23)
-                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                <span className="bg-priority-medium-surface text-priority-medium ring-priority-medium-border rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset">
                   Moyenne
                 </span>
               </li>

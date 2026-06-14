@@ -135,7 +135,7 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
               {draftState.message && (
                 <span
                   className={`text-sm ${
-                    draftState.ok ? "text-emerald-600" : "text-danger"
+                    draftState.ok ? "text-success" : "text-danger"
                   }`}
                 >
                   {draftState.message}
