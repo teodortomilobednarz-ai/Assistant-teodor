@@ -33,7 +33,7 @@ AUTH_SECRET=jZroN5S1daHBcYZex4EINEp9m5ufqw6/rCKAbHE49XIO
 
 ## 4. Connexion Google + Gmail — Google Cloud (gratuit)
 
-1. Va sur <https://console.cloud.google.com> → crée un projet (« Copilote PME »).
+1. Va sur <https://console.cloud.google.com> → crée un projet (« Aidly »).
 2. **APIs & Services → Library** → cherche **Gmail API** → **Enable**.
 3. **APIs & Services → OAuth consent screen** :
    - Type : **External** → Create.

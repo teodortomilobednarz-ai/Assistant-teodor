@@ -30,7 +30,7 @@ export default async function LandingPage() {
       <section className="flex flex-col items-start gap-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
           <span className="size-1.5 rounded-full bg-accent" />
-          Copilote IA pour PME
+          Aidly · l&apos;assistant IA pour PME
         </span>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
           L&apos;assistant IA qui vous fait gagner des heures chaque semaine.

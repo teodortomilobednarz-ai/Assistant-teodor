@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Copilote IA pour PME",
+  title: "Aidly — l'assistant IA pour PME",
   description:
-    "L'assistant IA qui résume vos emails, prépare vos réponses, crée vos tâches et retrouve vos informations.",
+    "Aidly résume vos emails, prépare vos réponses, crée vos tâches et retrouve vos informations.",
 };
 
 export default function RootLayout({

@@ -9,7 +9,7 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 
 ## Project
 
-- **Name:** Assistant-teodor
+- **Name:** Assistant-teodor (repository) — **product brand: Aidly** (target domain `aidly.app`).
 - **Repository:** `teodortomilobednarz-ai/assistant-teodor`
 - **Purpose:** Personal-assistant project for Teodor. The assistant's role, scope, and working
   rules are defined in [`ROLE.md`](ROLE.md) — read it before acting.
@@ -23,10 +23,11 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 - When starting a project: break it into concrete steps.
 - Optimize for profitability, automation, simplicity, fast execution, and durable growth.
 - Challenge ideas when relevant; keep a long-term view of the projects.
-- **Permission rule (mandatory):** before any action that **opens, sends, or pays** for
-  something (sending an email/message, sharing a file, placing an order, making a payment,
-  issuing an invoice, publishing, etc.), **ask the user for explicit approval first and wait
-  for a clear answer.** Read-only actions (list, search, read) do not require approval.
+- **Permission rule (mandatory, narrowed 2026-06-14):** ask for explicit approval ONLY before
+  **sending an email** or **spending money** (payment, paid order, invoice). Everything else —
+  code, configuration, renames, deploys, naming decisions — do **autonomously without asking**.
+  The owner does not want step-by-step guidance: act and report, don't hand the work back.
+  (Hard limit: the assistant cannot log into the owner's third-party accounts.)
 - **Project direction:** build a **SaaS — an "AI copilot for SMEs"** (AI assistant for small-
   business owners / independents). It connects to the customer's **email, calendar, and
   documents**, and the AI **summarizes**, **drafts replies**, **creates tasks**, and **retrieves
