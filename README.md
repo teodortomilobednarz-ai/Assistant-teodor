@@ -1,9 +1,9 @@
-# Aidly
+# Draidly
 
-**Aidly** — l'assistant IA qui aide les dirigeants de PME et les indépendants :
+**Draidly** — l'assistant IA qui aide les dirigeants de PME et les indépendants :
 il **résume** les emails, **prépare les réponses**, **crée les tâches** et
 **retrouve les informations**. Moteur : **Google Gemini** (palier gratuit).
-Domaine cible : `aidly.app`.
+Domaine cible : `draidly.app`.
 
 > **Statut : Palier 1 (fondation).** Application multi-utilisateurs : comptes
 > (connexion Google), base de données, tableau de bord, et analyse de texte dont

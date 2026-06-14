@@ -1,4 +1,4 @@
-// Prisma schema for Aidly.
+// Prisma schema for Draidly.
 // Auth.js (NextAuth) models + the app's own Task and Analysis models.
 
 generator client {
