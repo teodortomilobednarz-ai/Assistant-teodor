@@ -12,10 +12,41 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.AUTH_URL ?? "https://draidly.app";
+
 export const metadata: Metadata = {
-  title: "Draidly — l'assistant IA pour PME",
+  metadataBase: new URL(siteUrl),
+  applicationName: "Draidly",
+  title: {
+    default: "Draidly — l'assistant IA pour PME",
+    template: "%s · Draidly",
+  },
   description:
     "Draidly résume vos emails, prépare vos réponses, crée vos tâches et retrouve vos informations.",
+  keywords: [
+    "assistant IA",
+    "copilote PME",
+    "résumé email",
+    "Gmail",
+    "agenda",
+    "productivité",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: siteUrl,
+    siteName: "Draidly",
+    title: "Draidly — l'assistant IA pour PME",
+    description:
+      "Connectez vos emails, agenda et documents. Draidly résume, rédige vos réponses, crée vos tâches et retrouve vos infos.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Draidly — l'assistant IA pour PME",
+    description:
+      "Votre copilote IA branché à vos outils. Résume, rédige, organise, retrouve.",
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({

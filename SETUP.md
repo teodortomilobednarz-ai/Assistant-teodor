@@ -92,6 +92,34 @@ Au déploiement, les **tables de la base se créent automatiquement**. 🎉
 
 ---
 
+## 7. Domaine custom — draidly.app
+
+Une fois l'app en ligne sur `TON-APP.vercel.app`, branche le vrai domaine :
+
+1. **Vercel → projet → Settings → Domains** → ajoute `draidly.app` (et
+   `www.draidly.app`).
+2. Vercel affiche les **enregistrements DNS** à créer chez ton registrar :
+   - `A` pour `draidly.app` → `76.76.21.21`
+   - `CNAME` pour `www` → `cname.vercel-dns.com`
+   *(suis exactement ce que Vercel affiche — ça peut varier).*
+3. Attends la propagation DNS (quelques minutes → quelques heures). Vercel
+   provisionne le **HTTPS** automatiquement.
+4. **Variable d'env** : ajoute `AUTH_URL=https://draidly.app` dans Vercel
+   (Settings → Environment Variables) → **Redeploy**. Ça aligne callbacks OAuth,
+   `sitemap`, `robots` et les métadonnées de partage social.
+5. **Google Cloud → Credentials → ton OAuth client → Authorized redirect URIs** :
+   ajoute la ligne prod :
+   ```
+   https://draidly.app/api/auth/callback/google
+   ```
+   *(garde aussi l'URL `*.vercel.app` et `localhost` si tu testes encore).*
+
+> Vérif rapide : `https://draidly.app/api/health` doit répondre
+> `{"status":"ok"}`, et la connexion Google doit rediriger sans erreur
+> `redirect_uri_mismatch`.
+
+---
+
 ## En local (optionnel, pour développer)
 
 ```bash
