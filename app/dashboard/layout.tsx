@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
-import { LogoMark } from "@/components/brand/logo";
+import { Logo, LogoMark } from "@/components/brand/logo";
 import { NavLinks } from "@/components/dashboard/nav-links";
 
 export default async function DashboardLayout({
@@ -21,35 +21,54 @@ export default async function DashboardLayout({
   const { name, email, image } = session.user;
   const initial = (name ?? email ?? "?").charAt(0).toUpperCase();
 
+  const avatar = image ? (
+    <Image
+      src={image}
+      alt=""
+      width={32}
+      height={32}
+      className="size-8 rounded-full border border-border object-cover"
+    />
+  ) : (
+    <span className="bg-accent-soft flex size-8 items-center justify-center rounded-full text-sm font-semibold text-accent">
+      {initial}
+    </span>
+  );
+
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="glass sticky top-0 z-20 border-b border-border print:hidden">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-3">
-          <div className="flex items-center gap-4">
-            <LogoMark className="size-8" />
-            <NavLinks />
-          </div>
+    <div className="flex min-h-full">
+      {/* Sidebar — desktop */}
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface/40 lg:sticky lg:top-0 lg:flex lg:h-dvh print:hidden">
+        <div className="px-5 py-4">
+          <Logo />
+        </div>
+        <div className="flex-1 px-3">
+          <NavLinks vertical />
+        </div>
+        <div className="border-t border-border p-3">
           <div className="flex items-center gap-3">
-            {image ? (
-              <Image
-                src={image}
-                alt=""
-                width={32}
-                height={32}
-                className="size-8 rounded-full border border-border object-cover"
-              />
-            ) : (
-              <span className="bg-accent-soft flex size-8 items-center justify-center rounded-full text-sm font-semibold text-accent">
-                {initial}
-              </span>
-            )}
+            {avatar}
+            <p className="min-w-0 flex-1 truncate text-xs text-muted">{email}</p>
+          </div>
+          <div className="mt-2">
             <SignOutButton />
           </div>
         </div>
-      </header>
+      </aside>
 
-      <div className="relative flex flex-1 flex-col overflow-hidden">
+      {/* Main column */}
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="aurora opacity-50 print:hidden" />
+
+        {/* Top bar — mobile */}
+        <header className="glass sticky top-0 z-20 flex items-center gap-3 border-b border-border px-4 py-3 lg:hidden print:hidden">
+          <LogoMark className="size-8" />
+          <div className="min-w-0 flex-1">
+            <NavLinks />
+          </div>
+          <SignOutButton />
+        </header>
+
         <div className="relative flex flex-1 flex-col">{children}</div>
       </div>
     </div>
