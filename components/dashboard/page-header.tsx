@@ -9,7 +9,7 @@ interface PageHeaderProps {
 export function PageHeader({ icon: Icon, title, description }: PageHeaderProps) {
   return (
     <div className="animate-fade-up flex items-center gap-4">
-      <span className="bg-accent-soft flex size-12 shrink-0 items-center justify-center rounded-2xl text-accent">
+      <span className="bg-gradient-accent flex size-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm">
         <Icon className="size-6" />
       </span>
       <div className="min-w-0">

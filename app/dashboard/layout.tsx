@@ -48,7 +48,10 @@ export default async function DashboardLayout({
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col">{children}</div>
+      <div className="relative flex flex-1 flex-col overflow-hidden">
+        <div className="aurora opacity-50" />
+        <div className="relative flex flex-1 flex-col">{children}</div>
+      </div>
     </div>
   );
 }
