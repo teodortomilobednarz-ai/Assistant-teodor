@@ -175,6 +175,18 @@ export async function listMessages(
   return { messages, nextPageToken: list.nextPageToken };
 }
 
+/** Lightweight count of messages matching a query (uses resultSizeEstimate). */
+export async function countMessages(
+  accessToken: string,
+  q: string,
+): Promise<number> {
+  const data = await gmailFetch<{ resultSizeEstimate?: number }>(
+    accessToken,
+    `/messages?maxResults=1&q=${encodeURIComponent(q)}`,
+  );
+  return data.resultSizeEstimate ?? 0;
+}
+
 export async function getMessage(
   accessToken: string,
   id: string,

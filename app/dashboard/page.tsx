@@ -2,41 +2,26 @@ import Link from "next/link";
 
 import { auth } from "@/auth";
 import { Analyzer } from "@/components/copilot/analyzer";
+import { DaySummary } from "@/components/copilot/day-summary";
+import { PriorityBadge } from "@/components/copilot/priority-badge";
 import {
   ArrowRightIcon,
   CalendarIcon,
   ChecksIcon,
-  FileIcon,
   MailIcon,
+  ReceiptIcon,
   SparklesIcon,
 } from "@/components/icons";
+import { listUpcomingEvents } from "@/lib/calendar";
+import { countMessages, listMessages } from "@/lib/gmail";
+import { getValidGoogleAccessToken } from "@/lib/google";
 import { prisma } from "@/lib/prisma";
 
-const SHORTCUTS = [
-  {
-    href: "/dashboard/inbox",
-    icon: MailIcon,
-    title: "Boîte",
-    description: "Résumez et répondez à vos emails",
-  },
-  {
-    href: "/dashboard/agenda",
-    icon: CalendarIcon,
-    title: "Agenda",
-    description: "Vos RDV et le résumé du jour",
-  },
-  {
-    href: "/dashboard/docs",
-    icon: FileIcon,
-    title: "Documents",
-    description: "Cherchez et résumez vos docs",
-  },
-  {
-    href: "/dashboard/tasks",
-    icon: ChecksIcon,
-    title: "Tâches",
-    description: "Suivez vos actions à faire",
-  },
+const QUICK_ACTIONS = [
+  { href: "/dashboard/inbox", icon: MailIcon, label: "Traiter mes emails" },
+  { href: "/dashboard/billing", icon: ReceiptIcon, label: "Nouveau devis" },
+  { href: "/dashboard/agenda", icon: CalendarIcon, label: "Voir l'agenda" },
+  { href: "/dashboard/tasks", icon: ChecksIcon, label: "Mes tâches" },
 ];
 
 function StatCard({
@@ -45,7 +30,7 @@ function StatCard({
   icon: Icon,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
@@ -61,16 +46,50 @@ function StatCard({
   );
 }
 
+function senderName(from: string): string {
+  return from.replace(/<[^>]+>/, "").replace(/"/g, "").trim() || from;
+}
+
 export default async function DashboardPage() {
   const session = await auth();
   const userId = session!.user.id;
   const firstName = (session?.user?.name ?? "").split(" ")[0] ?? "";
 
-  const [openTasks, doneTasks, analyses] = await Promise.all([
+  const [openTasks, analyses, priorityTasks] = await Promise.all([
     prisma.task.count({ where: { userId, done: false } }),
-    prisma.task.count({ where: { userId, done: true } }),
     prisma.analysis.count({ where: { userId } }),
+    prisma.task.findMany({
+      where: { userId, done: false },
+      orderBy: [{ priority: "asc" }, { createdAt: "desc" }],
+      take: 5,
+    }),
   ]);
+
+  let unreadCount: number | string = "—";
+  let todayEvents: number | string = "—";
+  let unreadPreview: { id: string; name: string; subject: string }[] = [];
+  let googleConnected = true;
+
+  try {
+    const token = await getValidGoogleAccessToken(userId);
+    const [unread, page, events] = await Promise.all([
+      countMessages(token, "is:unread"),
+      listMessages(token, { q: "is:unread", maxResults: 3 }),
+      listUpcomingEvents(token, 20),
+    ]);
+    unreadCount = unread;
+    unreadPreview = page.messages.map((m) => ({
+      id: m.id,
+      name: senderName(m.from),
+      subject: m.subject || "(sans objet)",
+    }));
+    const today = new Date().toDateString();
+    todayEvents = events.filter(
+      (e) => e.start && new Date(e.start).toDateString() === today,
+    ).length;
+  } catch {
+    googleConnected = false;
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
@@ -79,39 +98,101 @@ export default async function DashboardPage() {
           Bonjour{firstName ? ` ${firstName}` : ""} 👋
         </h1>
         <p className="mt-1.5 text-muted">
-          Que voulez-vous déléguer à votre copilote aujourd&apos;hui ?
+          Voici votre centre de contrôle. Que voulez-vous déléguer aujourd&apos;hui ?
         </p>
       </div>
 
-      <div className="animate-fade-up delay-1 grid gap-4 sm:grid-cols-3">
+      {!googleConnected && (
+        <div className="rounded-2xl border border-accent/30 bg-accent-soft/60 px-4 py-3 text-sm">
+          Reconnectez-vous avec Google (déconnexion → reconnexion) pour activer
+          les emails et l&apos;agenda.
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="animate-fade-up delay-1 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Mails non lus" value={unreadCount} icon={MailIcon} />
+        <StatCard label="RDV aujourd'hui" value={todayEvents} icon={CalendarIcon} />
         <StatCard label="Tâches à faire" value={openTasks} icon={ChecksIcon} />
-        <StatCard label="Tâches terminées" value={doneTasks} icon={ChecksIcon} />
-        <StatCard label="Analyses générées" value={analyses} icon={SparklesIcon} />
+        <StatCard label="Analyses" value={analyses} icon={SparklesIcon} />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {SHORTCUTS.map(({ href, icon: Icon, title, description }, index) => (
+      {/* Quick actions */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {QUICK_ACTIONS.map(({ href, icon: Icon, label }) => (
           <Link
             key={href}
             href={href}
-            className={`group card-glow glow-hover animate-fade-up delay-${index + 1} rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-accent/40`}
+            className="group card-glow glow-hover flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5"
           >
-            <span className="bg-gradient-accent flex size-10 items-center justify-center rounded-xl text-white shadow-sm">
-              <Icon className="size-5" />
+            <span className="bg-gradient-accent flex size-9 items-center justify-center rounded-xl text-white shadow-sm">
+              <Icon className="size-4" />
             </span>
-            <h3 className="mt-3 text-sm font-semibold">{title}</h3>
-            <p className="mt-0.5 text-xs leading-relaxed text-muted">
-              {description}
-            </p>
-            <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
-              Ouvrir
-              <ArrowRightIcon className="size-3.5" />
-            </span>
+            <span className="text-sm font-medium">{label}</span>
+            <ArrowRightIcon className="ml-auto size-4 text-muted opacity-0 transition-opacity group-hover:opacity-100" />
           </Link>
         ))}
       </div>
 
-      <section className="animate-fade-up delay-2 rounded-3xl border border-border bg-surface p-6 shadow-sm sm:p-7">
+      {/* Overview grid */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <DaySummary />
+
+        <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
+            Tâches prioritaires
+          </h2>
+          {priorityTasks.length === 0 ? (
+            <p className="text-sm text-muted">Aucune tâche en cours.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-border">
+              {priorityTasks.map((task) => (
+                <li
+                  key={task.id}
+                  className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+                >
+                  <span className="truncate text-sm">{task.title}</span>
+                  <PriorityBadge priority={task.priority} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      {googleConnected && unreadPreview.length > 0 && (
+        <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+              Emails non lus
+            </h2>
+            <Link
+              href="/dashboard/inbox"
+              className="text-xs font-medium text-accent hover:text-accent-hover"
+            >
+              Tout voir →
+            </Link>
+          </div>
+          <ul className="flex flex-col divide-y divide-border">
+            {unreadPreview.map((mail) => (
+              <li key={mail.id}>
+                <Link
+                  href={`/dashboard/inbox/${mail.id}`}
+                  className="flex items-center justify-between gap-3 py-2.5 transition-colors first:pt-0 last:pb-0 hover:text-accent"
+                >
+                  <span className="truncate text-sm font-medium">{mail.name}</span>
+                  <span className="hidden truncate text-xs text-muted sm:block">
+                    {mail.subject}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Copilot */}
+      <section className="animate-fade-up rounded-3xl border border-border bg-surface p-6 shadow-sm sm:p-7">
         <div className="mb-6 flex items-center gap-3">
           <span className="bg-gradient-accent flex size-11 items-center justify-center rounded-2xl text-white shadow-sm">
             <SparklesIcon className="size-5" />
