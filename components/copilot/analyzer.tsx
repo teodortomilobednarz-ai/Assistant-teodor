@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { SparklesIcon } from "@/components/icons";
+import { Spinner } from "@/components/ui/spinner";
 import type { Analysis } from "@/lib/schema";
 
 import { AnalysisResults } from "./analysis-results";
@@ -114,9 +116,19 @@ export function Analyzer() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-all hover:bg-accent-hover hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
         >
-          {isLoading ? "Analyse en cours…" : "Analyser"}
+          {isLoading ? (
+            <>
+              <Spinner className="size-4" />
+              Analyse en cours…
+            </>
+          ) : (
+            <>
+              <SparklesIcon className="size-4" />
+              Analyser
+            </>
+          )}
         </button>
 
         {error && (
@@ -133,8 +145,15 @@ export function Analyzer() {
         {analysis ? (
           <AnalysisResults analysis={analysis} />
         ) : (
-          <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface/50 p-8 text-center">
-            <p className="text-sm text-muted">
+          <div className="flex h-full min-h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-surface/50 p-8 text-center">
+            <span className="bg-accent-soft flex size-12 items-center justify-center rounded-2xl text-accent">
+              {isLoading ? (
+                <Spinner className="size-5" />
+              ) : (
+                <SparklesIcon className="size-6" />
+              )}
+            </span>
+            <p className="max-w-xs text-sm text-muted">
               {isLoading
                 ? "Le copilote analyse votre texte…"
                 : "Le résumé, le brouillon de réponse et les tâches s'afficheront ici."}

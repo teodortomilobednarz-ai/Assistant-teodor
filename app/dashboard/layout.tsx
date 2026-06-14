@@ -1,8 +1,10 @@
-import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { LogoMark } from "@/components/brand/logo";
+import { NavLinks } from "@/components/dashboard/nav-links";
 
 export default async function DashboardLayout({
   children,
@@ -16,46 +18,31 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
+  const { name, email, image } = session.user;
+  const initial = (name ?? email ?? "?").charAt(0).toUpperCase();
+
   return (
     <div className="flex min-h-full flex-col">
-      <header className="border-b border-border bg-surface">
+      <header className="sticky top-0 z-20 border-b border-border bg-surface/85 backdrop-blur">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-3">
-          <nav className="flex items-center gap-1">
-            <Link
-              href="/dashboard"
-              className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-surface-muted"
-            >
-              Copilote
-            </Link>
-            <Link
-              href="/dashboard/inbox"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
-            >
-              Boîte
-            </Link>
-            <Link
-              href="/dashboard/agenda"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
-            >
-              Agenda
-            </Link>
-            <Link
-              href="/dashboard/docs"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
-            >
-              Documents
-            </Link>
-            <Link
-              href="/dashboard/tasks"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
-            >
-              Tâches
-            </Link>
-          </nav>
+          <div className="flex items-center gap-4">
+            <LogoMark className="size-8" />
+            <NavLinks />
+          </div>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-muted sm:inline">
-              {session.user.email}
-            </span>
+            {image ? (
+              <Image
+                src={image}
+                alt=""
+                width={32}
+                height={32}
+                className="size-8 rounded-full border border-border object-cover"
+              />
+            ) : (
+              <span className="bg-accent-soft flex size-8 items-center justify-center rounded-full text-sm font-semibold text-accent">
+                {initial}
+              </span>
+            )}
             <SignOutButton />
           </div>
         </div>

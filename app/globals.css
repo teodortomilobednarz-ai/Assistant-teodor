@@ -2,19 +2,21 @@
 
 /*
  * Design tokens — Draidly.
- * A single, deliberate light theme. Dark mode can be layered later by
- * swapping these custom properties; components only ever read the tokens.
+ * A refined, modern light theme with an indigo→violet accent, soft shadows,
+ * and a few tasteful motion utilities. Components only ever read the tokens.
  */
 :root {
-  --background: #f6f7f9;
+  --background: #fbfbfd;
   --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
+  --surface-muted: #f4f5f8;
+  --foreground: #0b1020;
+  --muted: #5b6478;
+  --border: #e7e8ef;
+  --accent: #5b54f0;
+  --accent-hover: #4a43e0;
   --accent-foreground: #ffffff;
+  --accent-soft: #eeefff;
+  --success: #0f9d6b;
   --danger: #b91c1c;
   --danger-surface: #fef2f2;
   --danger-border: #fecaca;
@@ -30,6 +32,8 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
   --color-danger: var(--danger);
   --color-danger-surface: var(--danger-surface);
   --color-danger-border: var(--danger-border);
@@ -41,4 +45,75 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gradient text used for hero headlines and the wordmark. */
+.text-gradient {
+  background-image: linear-gradient(115deg, #5b54f0 0%, #8b5cf6 45%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Accent gradient surface (buttons, logo mark). */
+.bg-gradient-accent {
+  background-image: linear-gradient(135deg, #6d5cf0 0%, #8b5cf6 55%, #4f46e5 100%);
+}
+
+/* Soft aurora glow for hero backgrounds. */
+.aurora {
+  position: absolute;
+  inset: -20% 0 auto 0;
+  height: 480px;
+  background:
+    radial-gradient(40% 50% at 20% 30%, rgba(124, 92, 255, 0.22), transparent 70%),
+    radial-gradient(35% 45% at 80% 20%, rgba(99, 102, 241, 0.18), transparent 70%),
+    radial-gradient(30% 40% at 60% 60%, rgba(139, 92, 246, 0.14), transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Entrance motion. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.delay-1 {
+  animation-delay: 0.08s;
+}
+.delay-2 {
+  animation-delay: 0.16s;
+}
+.delay-3 {
+  animation-delay: 0.24s;
+}
+.delay-4 {
+  animation-delay: 0.32s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+  }
+}
+
+/* Subtle grid texture for section backgrounds. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(11, 16, 32, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 16, 32, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
