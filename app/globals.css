@@ -185,6 +185,18 @@ select:focus-visible {
   }
 }
 
+/* Task completion / removal exit. */
+@keyframes task-out {
+  to {
+    opacity: 0;
+    transform: translateX(10px) scale(0.98);
+  }
+}
+.animate-task-out {
+  animation: task-out 0.25s ease forwards;
+  pointer-events: none;
+}
+
 /* Entrance motion. */
 @keyframes fade-up {
   from {
@@ -218,7 +230,8 @@ select:focus-visible {
   .animate-fade-up,
   .aurora,
   .shimmer,
-  .float {
+  .float,
+  .animate-task-out {
     animation: none;
   }
 }

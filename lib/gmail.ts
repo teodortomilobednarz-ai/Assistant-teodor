@@ -16,6 +16,12 @@ export interface GmailSummary {
   subject: string;
   date: string;
   snippet: string;
+  unread: boolean;
+}
+
+export interface MessagePage {
+  messages: GmailSummary[];
+  nextPageToken?: string;
 }
 
 export interface GmailMessage {
@@ -44,6 +50,7 @@ interface GmailMessageResource {
   id: string;
   threadId: string;
   snippet?: string;
+  labelIds?: string[];
   payload?: GmailPayload;
 }
 
@@ -123,18 +130,31 @@ async function gmailFetch<T>(
   return response.json() as Promise<T>;
 }
 
-export async function listRecentMessages(
+/**
+ * Lists messages matching a Gmail search query (`q`), with pagination.
+ * `q` supports Gmail's full search syntax — `is:unread`, `newer_than:7d`,
+ * `has:attachment`, `from:alice@x.com`, free text — across the whole mailbox,
+ * so even months-old emails are reachable.
+ */
+export async function listMessages(
   accessToken: string,
-  maxResults = 12,
-): Promise<GmailSummary[]> {
-  const list = await gmailFetch<{ messages?: { id: string }[] }>(
-    accessToken,
-    `/messages?maxResults=${maxResults}&q=in:inbox`,
-  );
+  opts: { q?: string; pageToken?: string; maxResults?: number } = {},
+): Promise<MessagePage> {
+  const params = new URLSearchParams();
+  params.set("maxResults", String(opts.maxResults ?? 25));
+  if (opts.q) params.set("q", opts.q);
+  if (opts.pageToken) params.set("pageToken", opts.pageToken);
 
-  if (!list.messages?.length) return [];
+  const list = await gmailFetch<{
+    messages?: { id: string }[];
+    nextPageToken?: string;
+  }>(accessToken, `/messages?${params.toString()}`);
 
-  return Promise.all(
+  if (!list.messages?.length) {
+    return { messages: [], nextPageToken: list.nextPageToken };
+  }
+
+  const messages = await Promise.all(
     list.messages.map(async ({ id }) => {
       const msg = await gmailFetch<GmailMessageResource>(
         accessToken,
@@ -147,9 +167,12 @@ export async function listRecentMessages(
         subject: header(msg.payload?.headers, "Subject"),
         date: header(msg.payload?.headers, "Date"),
         snippet: msg.snippet ?? "",
+        unread: (msg.labelIds ?? []).includes("UNREAD"),
       };
     }),
   );
+
+  return { messages, nextPageToken: list.nextPageToken };
 }
 
 export async function getMessage(
