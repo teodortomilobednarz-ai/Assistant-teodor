@@ -2,25 +2,24 @@
 
 /*
  * Design tokens — Draidly.
- * A refined light theme with an indigo→violet accent, soft shadows, and a
- * set of "futuristic" motion utilities (animated aurora, glow, glass, shimmer,
- * float). Components only ever read the tokens.
+ * A dark, futuristic theme: near-black backdrop, neon indigo→violet→cyan
+ * accents, glow, glass and motion. Components only ever read the tokens.
  */
 :root {
-  --background: #fbfbfd;
-  --surface: #ffffff;
-  --surface-muted: #f4f5f8;
-  --foreground: #0b1020;
-  --muted: #5b6478;
-  --border: #e7e8ef;
-  --accent: #5b54f0;
-  --accent-hover: #4a43e0;
+  --background: #07060f;
+  --surface: #100f1d;
+  --surface-muted: #191830;
+  --foreground: #ecedf6;
+  --muted: #9b9fc0;
+  --border: #262542;
+  --accent: #8b7dff;
+  --accent-hover: #a394ff;
   --accent-foreground: #ffffff;
-  --accent-soft: #eeefff;
-  --success: #0f9d6b;
-  --danger: #b91c1c;
-  --danger-surface: #fef2f2;
-  --danger-border: #fecaca;
+  --accent-soft: #1d1b3a;
+  --success: #34d399;
+  --danger: #fb7185;
+  --danger-surface: #2a1320;
+  --danger-border: #4a2236;
 }
 
 @theme inline {
@@ -43,7 +42,10 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(70% 55% at 50% -10%, rgba(124, 92, 255, 0.14), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -84,9 +86,9 @@ body {
   inset: -25% 0 auto 0;
   height: 560px;
   background:
-    radial-gradient(40% 50% at 18% 28%, rgba(124, 92, 255, 0.28), transparent 70%),
-    radial-gradient(34% 46% at 82% 18%, rgba(34, 211, 238, 0.16), transparent 70%),
-    radial-gradient(32% 42% at 62% 62%, rgba(139, 92, 246, 0.2), transparent 70%);
+    radial-gradient(40% 50% at 18% 28%, rgba(124, 92, 255, 0.4), transparent 70%),
+    radial-gradient(34% 46% at 82% 18%, rgba(34, 211, 238, 0.26), transparent 70%),
+    radial-gradient(32% 42% at 62% 62%, rgba(139, 92, 246, 0.32), transparent 70%);
   filter: blur(10px);
   pointer-events: none;
   z-index: 0;
@@ -207,7 +209,7 @@ body {
 /* Subtle grid texture for section backgrounds. */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgba(11, 16, 32, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 16, 32, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 32px 32px;
 }
