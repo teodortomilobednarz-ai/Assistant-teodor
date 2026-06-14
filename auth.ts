@@ -14,6 +14,8 @@ import { prisma } from "@/lib/prisma";
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  // Trust the deployment host (Vercel / custom domain) for callback URLs.
+  trustHost: true,
   session: { strategy: "database" },
   providers: [
     Google({
