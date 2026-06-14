@@ -10,6 +10,7 @@ import {
   MailIcon,
   SparklesIcon,
 } from "@/components/icons";
+import { prisma } from "@/lib/prisma";
 
 const SHORTCUTS = [
   {
@@ -38,9 +39,38 @@ const SHORTCUTS = [
   },
 ];
 
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-muted">{label}</span>
+        <span className="bg-accent-soft flex size-8 items-center justify-center rounded-lg text-accent">
+          <Icon className="size-4" />
+        </span>
+      </div>
+      <p className="mt-2 text-3xl font-semibold tracking-tight">{value}</p>
+    </div>
+  );
+}
+
 export default async function DashboardPage() {
   const session = await auth();
+  const userId = session!.user.id;
   const firstName = (session?.user?.name ?? "").split(" ")[0] ?? "";
+
+  const [openTasks, doneTasks, analyses] = await Promise.all([
+    prisma.task.count({ where: { userId, done: false } }),
+    prisma.task.count({ where: { userId, done: true } }),
+    prisma.analysis.count({ where: { userId } }),
+  ]);
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
@@ -51,6 +81,12 @@ export default async function DashboardPage() {
         <p className="mt-1.5 text-muted">
           Que voulez-vous déléguer à votre copilote aujourd&apos;hui ?
         </p>
+      </div>
+
+      <div className="animate-fade-up delay-1 grid gap-4 sm:grid-cols-3">
+        <StatCard label="Tâches à faire" value={openTasks} icon={ChecksIcon} />
+        <StatCard label="Tâches terminées" value={doneTasks} icon={ChecksIcon} />
+        <StatCard label="Analyses générées" value={analyses} icon={SparklesIcon} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
