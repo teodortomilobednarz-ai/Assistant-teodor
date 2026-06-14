@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
 import { Spinner } from "@/components/ui/spinner";
+import { useToast } from "@/components/ui/toast";
 import {
   generateInvoice,
   type GenerateInvoiceState,
@@ -27,6 +28,15 @@ export function BillingWorkspace({ profile }: BillingWorkspaceProps) {
     generateInvoice,
     initialState,
   );
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (state.ok && state.invoiceId) {
+      toast("Document généré.", "success");
+    } else if (state.message) {
+      toast(state.message, "error");
+    }
+  }, [state, toast]);
 
   return (
     <form action={action} className="flex flex-col gap-6">

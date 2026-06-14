@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
+import { useToast } from "@/components/ui/toast";
 import {
   createCalendarEvent,
   type EventActionState,
@@ -17,6 +18,13 @@ export function CreateEventForm() {
     createCalendarEvent,
     initialState,
   );
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (state.message) {
+      toast(state.message, state.ok ? "success" : "error");
+    }
+  }, [state, toast]);
 
   return (
     <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">

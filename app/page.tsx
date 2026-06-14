@@ -63,6 +63,12 @@ const INTEGRATIONS = [
   { icon: FileIcon, label: "Drive" },
 ];
 
+const STATS = [
+  { value: "4", label: "sources connectées : email, agenda, documents, tâches" },
+  { value: "< 5 s", label: "pour résumer un email et préparer une réponse" },
+  { value: "0", label: "envoi ou action sans votre validation" },
+];
+
 export default async function LandingPage() {
   const session = await auth();
 
@@ -149,6 +155,23 @@ export default async function LandingPage() {
               <Icon className="size-5 text-accent" />
               {label}
             </span>
+          ))}
+        </div>
+      </section>
+
+      {/* Stats band */}
+      <section className="mx-auto w-full max-w-6xl px-6 py-14">
+        <div className="grid gap-4 sm:grid-cols-3">
+          {STATS.map((stat) => (
+            <div
+              key={stat.label}
+              className="glow-hover card-glow rounded-2xl border border-border bg-surface p-6 text-center shadow-sm"
+            >
+              <p className="text-gradient text-4xl font-bold">{stat.value}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                {stat.label}
+              </p>
+            </div>
           ))}
         </div>
       </section>

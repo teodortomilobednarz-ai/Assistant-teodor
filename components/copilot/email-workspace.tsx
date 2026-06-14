@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { SparklesIcon } from "@/components/icons";
 import { Spinner } from "@/components/ui/spinner";
+import { useToast } from "@/components/ui/toast";
 import { createDraftAction, type DraftActionState } from "@/lib/actions/gmail";
 import type { Analysis } from "@/lib/schema";
 
@@ -30,6 +31,13 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
     createDraftAction,
     initialDraftState,
   );
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (draftState.message) {
+      toast(draftState.message, draftState.ok ? "success" : "error");
+    }
+  }, [draftState, toast]);
 
   const replySubject = email.subject.startsWith("Re:")
     ? email.subject
