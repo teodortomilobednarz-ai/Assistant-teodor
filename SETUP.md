@@ -81,7 +81,14 @@ Au déploiement, les **tables de la base se créent automatiquement**. 🎉
    - **Boîte** : tes vrais emails Gmail → ouvre-en un → « Analyser » → édite la
      réponse → **Créer le brouillon dans Gmail** (le brouillon apparaît dans
      Gmail, **jamais envoyé**).
+   - **Agenda** : tes prochains rendez-vous, un résumé IA de ta journée, et la
+     création d'un événement (créé dans Google Agenda).
+   - **Documents** : recherche un Google Doc dans ton Drive et obtiens un résumé.
    - **Tâches** : retrouve et coche tes tâches.
+
+> 🔑 **Agenda + Documents** demandent des autorisations Google supplémentaires
+> (Calendar + Drive). Si tu t'es déjà connecté avant leur ajout : **déconnecte-toi
+> puis reconnecte-toi** — Google te redemandera ces accès une fois.
 
 ---
 

@@ -2,10 +2,11 @@
 
 This file gives guidance to AI assistants (Claude Code and others) working in this repository.
 
-> **Status: Milestone 1 (foundation) built.** The repository contains a working Next.js
-> application: Google sign-in (Auth.js), a PostgreSQL database (Prisma), a protected dashboard,
-> and an AI text-analysis feature (Google Gemini) whose tasks and analyses are persisted per
-> user. Gmail / Calendar / Drive integrations are planned for the next milestones.
+> **Status: MVP built (Milestones 1–3).** Working Next.js app: Google sign-in (Auth.js),
+> PostgreSQL (Prisma), a protected dashboard, and the AI engine (Google Gemini) wired across all
+> four data sources — text analysis with persisted tasks, **Gmail** (read inbox, draft replies),
+> **Calendar** (day summary, create events), and **Drive** (search + summarize Google Docs).
+> Nothing is sent or created without an explicit user click.
 
 ## Project
 
@@ -47,6 +48,9 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   ├── page.tsx                   # Public landing page (sign-in)
 │   ├── dashboard/                 # Protected area (auth guard in layout.tsx)
 │   │   ├── page.tsx               # Copilot (text analysis)
+│   │   ├── inbox/                 # Gmail: list + email workspace (draft replies)
+│   │   ├── agenda/page.tsx        # Calendar: events, day summary, create event
+│   │   ├── docs/page.tsx          # Drive: search + summarize Google Docs
 │   │   └── tasks/page.tsx         # Persisted tasks
 │   ├── api/analyze/route.ts       # Analyze endpoint (+ persistence)
 │   ├── api/auth/[...nextauth]/    # Auth.js routes
@@ -55,9 +59,11 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 ├── components/                    # UI: copilot/, auth/
 ├── lib/
 │   ├── gemini.ts · copilot.ts     # AI engine (Gemini) + core logic
+│   ├── google.ts                  # OAuth token refresh for Google APIs
+│   ├── gmail.ts · calendar.ts · drive.ts  # Google API clients
 │   ├── prisma.ts                  # Prisma client singleton
 │   ├── env.ts · schema.ts         # Validated env + Zod schemas
-│   └── actions/                   # Server actions (auth, tasks)
+│   └── actions/                   # Server actions (auth, tasks, gmail, calendar, drive)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
 ├── CLAUDE.md · ROLE.md · README.md

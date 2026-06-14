@@ -34,6 +34,18 @@ export default async function DashboardLayout({
               Boîte
             </Link>
             <Link
+              href="/dashboard/agenda"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
+            >
+              Agenda
+            </Link>
+            <Link
+              href="/dashboard/docs"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
+            >
+              Documents
+            </Link>
+            <Link
               href="/dashboard/tasks"
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
             >

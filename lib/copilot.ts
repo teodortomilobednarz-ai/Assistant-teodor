@@ -60,6 +60,32 @@ Règles :
 
 Tu ne fais que préparer et proposer : tu n'envoies rien et ne prends aucune action externe.`;
 
+/**
+ * Generic plain-text generation (e.g. day summary, document summary).
+ * Returns the model's text response, in French.
+ */
+export async function summarize(opts: {
+  instruction: string;
+  content: string;
+}): Promise<string> {
+  const client = getGeminiClient();
+
+  const response = await client.models.generateContent({
+    model: MODEL,
+    contents: opts.content,
+    config: {
+      systemInstruction: opts.instruction,
+      temperature: 0.4,
+    },
+  });
+
+  const text = response.text;
+  if (!text || !text.trim()) {
+    throw new Error("Réponse vide du modèle.");
+  }
+  return text.trim();
+}
+
 export async function analyzeContent(input: AnalyzeRequest): Promise<Analysis> {
   const client = getGeminiClient();
 

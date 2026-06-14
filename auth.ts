@@ -31,6 +31,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             "email",
             "profile",
             "https://www.googleapis.com/auth/gmail.modify",
+            "https://www.googleapis.com/auth/calendar.events",
+            "https://www.googleapis.com/auth/drive.readonly",
           ].join(" "),
         },
       },
