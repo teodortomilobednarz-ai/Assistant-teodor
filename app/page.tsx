@@ -256,7 +256,15 @@ export default async function LandingPage() {
       <footer className="border-t border-border">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted sm:flex-row">
           <Logo />
-          <span>Propulsé par Google Gemini · Vos données restent les vôtres.</span>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-foreground">
+              Confidentialité
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              Conditions
+            </Link>
+            <span>Propulsé par Google Gemini</span>
+          </div>
         </div>
       </footer>
     </div>
