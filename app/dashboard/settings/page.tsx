@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { GearIcon, MailIcon } from "@/components/icons";
+import { DeleteAccount } from "@/components/settings/delete-account";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { prisma } from "@/lib/prisma";
 
@@ -100,6 +101,10 @@ export default async function SettingsPage() {
             <SignOutButton />
           </div>
         </div>
+      </Card>
+
+      <Card title="Confidentialité & données">
+        <DeleteAccount />
       </Card>
     </main>
   );
