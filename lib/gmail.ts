@@ -286,6 +286,28 @@ export async function markAsRead(
   });
 }
 
+/** Re-adds the UNREAD label. */
+export async function markUnread(
+  accessToken: string,
+  id: string,
+): Promise<void> {
+  await gmailFetch(accessToken, `/messages/${id}/modify`, {
+    method: "POST",
+    body: JSON.stringify({ addLabelIds: ["UNREAD"] }),
+  });
+}
+
+/** Removes the INBOX label (archives the message). */
+export async function archiveMessage(
+  accessToken: string,
+  id: string,
+): Promise<void> {
+  await gmailFetch(accessToken, `/messages/${id}/modify`, {
+    method: "POST",
+    body: JSON.stringify({ removeLabelIds: ["INBOX"] }),
+  });
+}
+
 export async function createDraft(
   accessToken: string,
   draft: { to: string; subject: string; body: string; threadId?: string },

@@ -1,7 +1,12 @@
 "use server";
 
 import { auth } from "@/auth";
-import { listMessages, type GmailSummary } from "@/lib/gmail";
+import {
+  archiveMessage,
+  listMessages,
+  markUnread,
+  type GmailSummary,
+} from "@/lib/gmail";
 import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 const FILTER_QUERIES: Record<string, string> = {
@@ -69,4 +74,40 @@ export async function fetchInbox(
         : "Impossible de charger les emails pour le moment.",
     };
   }
+}
+
+export interface MailActionState {
+  ok: boolean;
+  message: string;
+}
+
+async function mailAction(
+  id: string,
+  fn: (token: string, id: string) => Promise<void>,
+  okMessage: string,
+): Promise<MailActionState> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return { ok: false, message: "Non authentifié." };
+  try {
+    const accessToken = await getValidGoogleAccessToken(userId);
+    await fn(accessToken, id);
+    return { ok: true, message: okMessage };
+  } catch (error) {
+    console.error("[mailAction] failed:", error);
+    return {
+      ok: false,
+      message: isReconnectError(error)
+        ? "Reconnecte-toi avec Google."
+        : "Action impossible pour le moment.",
+    };
+  }
+}
+
+export async function archiveEmail(id: string): Promise<MailActionState> {
+  return mailAction(id, archiveMessage, "Email archivé.");
+}
+
+export async function markEmailUnread(id: string): Promise<MailActionState> {
+  return mailAction(id, markUnread, "Marqué comme non lu.");
 }
