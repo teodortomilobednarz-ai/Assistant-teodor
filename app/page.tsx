@@ -243,6 +243,33 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Trust & privacy */}
+      <section className="mx-auto w-full max-w-6xl px-6 py-16">
+        <div className="rounded-3xl border border-border bg-surface p-8 shadow-sm sm:p-10">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-5">
+            <span className="bg-accent-soft flex size-11 shrink-0 items-center justify-center rounded-xl text-accent">
+              <ShieldIcon className="size-5" />
+            </span>
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Vos données restent les vôtres
+              </h2>
+              <p className="mt-2 max-w-2xl text-muted">
+                Draidly se connecte à vos outils Google avec votre autorisation,
+                uniquement pour vous rendre service. Rien n&apos;est envoyé sans
+                votre clic, vos données ne sont jamais vendues, et vous pouvez
+                tout supprimer à tout moment depuis vos réglages. Notre usage des
+                API Google respecte la{" "}
+                <Link href="/privacy" className="text-accent hover:underline">
+                  Google API Services User Data Policy
+                </Link>{" "}
+                (Limited Use).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="mx-auto w-full max-w-6xl px-6 py-20">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-surface px-8 py-14 text-center shadow-sm">
