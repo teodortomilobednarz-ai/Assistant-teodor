@@ -275,6 +275,17 @@ export async function getMessage(
   };
 }
 
+/** Removes the UNREAD label so an opened email is marked read. */
+export async function markAsRead(
+  accessToken: string,
+  id: string,
+): Promise<void> {
+  await gmailFetch(accessToken, `/messages/${id}/modify`, {
+    method: "POST",
+    body: JSON.stringify({ removeLabelIds: ["UNREAD"] }),
+  });
+}
+
 export async function createDraft(
   accessToken: string,
   draft: { to: string; subject: string; body: string; threadId?: string },

@@ -2,7 +2,12 @@
 
 import { auth } from "@/auth";
 import { summarize } from "@/lib/copilot";
-import { getDocumentText, searchFiles, type DriveFile } from "@/lib/drive";
+import {
+  getDocumentText,
+  listRecentFiles,
+  searchFiles,
+  type DriveFile,
+} from "@/lib/drive";
 import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 async function requireToken(): Promise<string> {
@@ -36,6 +41,23 @@ export async function searchDrive(query: string): Promise<DriveSearchResult> {
       error: isReconnectError(error)
         ? "Reconnecte-toi avec Google (déconnexion → reconnexion) pour autoriser Drive."
         : "Recherche impossible pour le moment.",
+    };
+  }
+}
+
+export async function listRecentDocs(): Promise<DriveSearchResult> {
+  try {
+    const accessToken = await requireToken();
+    const files = await listRecentFiles(accessToken);
+    return { ok: true, files };
+  } catch (error) {
+    console.error("[listRecentDocs] failed:", error);
+    return {
+      ok: false,
+      files: [],
+      error: isReconnectError(error)
+        ? "Reconnecte-toi avec Google (déconnexion → reconnexion) pour autoriser Drive."
+        : "Impossible de charger les documents pour le moment.",
     };
   }
 }

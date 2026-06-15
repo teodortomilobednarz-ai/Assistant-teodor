@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { searchDrive, summarizeDoc } from "@/lib/actions/drive";
+import { listRecentDocs, searchDrive, summarizeDoc } from "@/lib/actions/drive";
 
 type DriveFile = Awaited<ReturnType<typeof searchDrive>>["files"][number];
 
@@ -16,6 +16,19 @@ export function DocsWorkspace() {
   const [summary, setSummary] = useState<string | null>(null);
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
+
+  // Show recent documents by default.
+  useEffect(() => {
+    let active = true;
+    listRecentDocs().then((result) => {
+      if (!active) return;
+      if (result.ok) setFiles(result.files);
+      else setError(result.error ?? null);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

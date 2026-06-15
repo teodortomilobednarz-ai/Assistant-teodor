@@ -58,6 +58,38 @@ export async function searchFiles(
   }));
 }
 
+/** Lists the most recently modified (non-trashed) files. */
+export async function listRecentFiles(
+  accessToken: string,
+  maxResults = 15,
+): Promise<DriveFile[]> {
+  const params = new URLSearchParams({
+    q: "trashed = false",
+    pageSize: String(maxResults),
+    orderBy: "modifiedTime desc",
+    fields: "files(id,name,mimeType,modifiedTime)",
+  });
+
+  const response = await fetch(`${DRIVE_API}/files?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`Drive API error ${response.status}: ${detail}`);
+  }
+
+  const data = (await response.json()) as { files?: RawFile[] };
+  return (data.files ?? []).map((file) => ({
+    id: file.id,
+    name: file.name,
+    mimeType: file.mimeType,
+    modifiedTime: file.modifiedTime ?? "",
+    isGoogleDoc: file.mimeType === GOOGLE_DOC_MIME,
+  }));
+}
+
 /**
  * Returns the plain-text content of a Google Doc. Throws for unsupported file
  * types (the caller should surface a friendly message).

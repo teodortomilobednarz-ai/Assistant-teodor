@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo, LogoMark } from "@/components/brand/logo";
+import { CommandPalette } from "@/components/dashboard/command-palette";
 import { NavLinks } from "@/components/dashboard/nav-links";
 import { prisma } from "@/lib/prisma";
 
@@ -81,6 +82,8 @@ export default async function DashboardLayout({
 
         <div className="relative flex flex-1 flex-col">{children}</div>
       </div>
+
+      <CommandPalette />
     </div>
   );
 }
