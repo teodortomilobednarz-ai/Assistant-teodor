@@ -12,29 +12,12 @@ export const dynamic = "force-dynamic";
 export default async function AbonnementPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; reason?: string }>;
+  searchParams: Promise<{ status?: string }>;
 }) {
   const session = await auth();
   const userId = session!.user.id;
   const status = await getSubscriptionStatus(userId);
-  const { status: outcome, reason } = await searchParams;
-
-  // Temporary diagnostic: which billing env vars does the running deployment
-  // actually see? Names only — values are never read or shown.
-  const EXPECTED = [
-    "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET",
-    "STRIPE_PRICE_ESSENTIEL_MONTHLY",
-    "STRIPE_PRICE_PRO_MONTHLY",
-    "NEXT_PUBLIC_APP_URL",
-  ];
-  const envPresence = EXPECTED.map((name) => ({
-    name,
-    present: Boolean(process.env[name] && process.env[name]!.trim()),
-  }));
-  const detectedStripeKeys = Object.keys(process.env).filter((k) =>
-    k.toUpperCase().includes("STRIPE"),
-  );
+  const { status: outcome } = await searchParams;
 
   const current = planById(status.plan);
   const periodEnd = status.currentPeriodEnd?.toLocaleDateString("fr-FR", {
@@ -63,30 +46,8 @@ export default async function AbonnementPage({
       )}
       {outcome === "error" && (
         <div className="rounded-2xl border border-danger/30 bg-danger-surface p-4 text-sm text-foreground">
-          <p className="font-semibold">Le paiement n&apos;a pas pu démarrer.</p>
-          {reason && (
-            <p className="mt-2 break-words font-mono text-xs text-danger">
-              {reason}
-            </p>
-          )}
-          <div className="mt-3 rounded-lg border border-border bg-surface p-3">
-            <p className="mb-1.5 text-xs font-semibold text-muted">
-              Diagnostic — variables vues par ce déploiement :
-            </p>
-            <ul className="flex flex-col gap-0.5 font-mono text-xs">
-              {envPresence.map((e) => (
-                <li key={e.name}>
-                  {e.present ? "✅" : "❌"} {e.name}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-xs text-muted">
-              Clés contenant « STRIPE » détectées :{" "}
-              {detectedStripeKeys.length > 0
-                ? detectedStripeKeys.join(", ")
-                : "aucune"}
-            </p>
-          </div>
+          Le paiement n&apos;a pas pu démarrer. Veuillez réessayer dans un
+          instant.
         </div>
       )}
 

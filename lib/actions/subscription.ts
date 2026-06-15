@@ -12,22 +12,6 @@ import {
   type PlanTier,
 } from "@/lib/stripe";
 
-/** Extracts as much detail as possible from an error (incl. network cause). */
-function describeError(error: unknown): string {
-  if (!(error instanceof Error)) return String(error);
-  const parts: string[] = [`${error.name}: ${error.message}`];
-  const any = error as unknown as Record<string, unknown>;
-  if (any.code) parts.push(`code=${String(any.code)}`);
-  if (any.type) parts.push(`type=${String(any.type)}`);
-  const detail = any.detail as { message?: string; code?: string } | undefined;
-  if (detail) parts.push(`detail=${detail.message ?? JSON.stringify(detail)}`);
-  const cause = error.cause as
-    | { message?: string; code?: string }
-    | undefined;
-  if (cause) parts.push(`cause=${cause.message ?? cause}(${cause.code ?? ""})`);
-  return parts.join(" | ");
-}
-
 /** Ensures the user has a Stripe customer, creating one on first need. */
 async function ensureCustomer(
   userId: string,
@@ -80,14 +64,9 @@ export async function startCheckout(
     });
     url = checkout.url;
   } catch (error) {
-    // Log the real Stripe error (Vercel logs) AND surface it on the page so the
-    // owner can see the exact cause without digging into dashboards.
+    // Log server-side; show the user a clean, generic message.
     console.error("[startCheckout] failed:", error);
-    redirect(
-      `/dashboard/abonnement?status=error&reason=${encodeURIComponent(
-        describeError(error).slice(0, 400),
-      )}`,
-    );
+    redirect("/dashboard/abonnement?status=error");
   }
 
   if (!url) redirect("/dashboard/abonnement?status=error");
