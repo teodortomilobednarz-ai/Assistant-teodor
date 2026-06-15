@@ -89,6 +89,9 @@ export default async function TarifsPage() {
             <Link href="/terms" className="hover:text-foreground">
               Conditions
             </Link>
+            <Link href="/mentions-legales" className="hover:text-foreground">
+              Mentions légales
+            </Link>
           </div>
         </div>
       </footer>

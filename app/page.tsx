@@ -274,6 +274,9 @@ export default async function LandingPage() {
             <Link href="/terms" className="hover:text-foreground">
               Conditions
             </Link>
+            <Link href="/mentions-legales" className="hover:text-foreground">
+              Mentions légales
+            </Link>
             <span>Propulsé par Google Gemini</span>
           </div>
         </div>
