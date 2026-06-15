@@ -61,8 +61,10 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   │   └── settings/page.tsx      # Account, business profile, Google connection
 │   ├── api/analyze/route.ts       # Analyze endpoint (+ persistence)
 │   ├── api/auth/[...nextauth]/    # Auth.js routes
+│   ├── privacy/page.tsx · terms/page.tsx  # Legal pages (Google OAuth verification)
+│   ├── icon.svg · apple-icon.svg  # Branded favicon + touch icon
 │   ├── error.tsx · not-found.tsx  # Error boundary + 404
-│   └── layout.tsx · globals.css   # Root layout (ToastProvider) + design tokens
+│   └── layout.tsx · globals.css   # Root layout (ToastProvider, metadata) + design tokens
 ├── auth.ts                        # Auth.js (NextAuth v5) config (persists OAuth tokens on sign-in)
 ├── components/                    # UI: copilot/, inbox/, billing/, dashboard/, settings/, etc.
 ├── lib/
