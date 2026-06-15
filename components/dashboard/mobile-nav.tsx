@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import {
+  BoltIcon,
   CalendarIcon,
   ChecksIcon,
   FileIcon,
@@ -37,6 +38,7 @@ const MORE: Item[] = [
   { href: "/dashboard/relances", label: "Relances", icon: ReplyIcon },
   { href: "/dashboard/billing", label: "Devis & factures", icon: ReceiptIcon },
   { href: "/dashboard/tasks", label: "Tâches", icon: ChecksIcon },
+  { href: "/dashboard/abonnement", label: "Abonnement", icon: BoltIcon },
   { href: "/dashboard/settings", label: "Réglages", icon: GearIcon },
 ];
 

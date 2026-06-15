@@ -90,16 +90,24 @@ export default async function LandingPage() {
       <header className="glass sticky top-0 z-20 border-b border-border/70">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3">
           <Logo />
-          {session?.user ? (
+          <div className="flex items-center gap-4">
             <Link
-              href="/dashboard"
-              className="text-sm font-medium text-muted transition-colors hover:text-foreground"
+              href="/tarifs"
+              className="hidden text-sm font-medium text-muted transition-colors hover:text-foreground sm:block"
             >
-              Tableau de bord →
+              Tarifs
             </Link>
-          ) : (
-            <SignInButton label="Se connecter" className="px-4 py-2 text-sm" />
-          )}
+            {session?.user ? (
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-muted transition-colors hover:text-foreground"
+              >
+                Tableau de bord →
+              </Link>
+            ) : (
+              <SignInButton label="Se connecter" className="px-4 py-2 text-sm" />
+            )}
+          </div>
         </div>
       </header>
 
@@ -257,6 +265,9 @@ export default async function LandingPage() {
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted sm:flex-row">
           <Logo />
           <div className="flex items-center gap-4">
+            <Link href="/tarifs" className="hover:text-foreground">
+              Tarifs
+            </Link>
             <Link href="/privacy" className="hover:text-foreground">
               Confidentialité
             </Link>

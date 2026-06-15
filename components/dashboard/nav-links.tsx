@@ -4,24 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
+  BoltIcon,
   CalendarIcon,
   ChecksIcon,
   FileIcon,
   GearIcon,
+  HomeIcon,
   MailIcon,
   ReceiptIcon,
   ReplyIcon,
-  SparklesIcon,
 } from "@/components/icons";
 
 const LINKS = [
-  { href: "/dashboard", label: "Accueil", icon: SparklesIcon, exact: true },
+  { href: "/dashboard", label: "Accueil", icon: HomeIcon, exact: true },
   { href: "/dashboard/inbox", label: "Boîte", icon: MailIcon },
   { href: "/dashboard/relances", label: "Relances", icon: ReplyIcon },
   { href: "/dashboard/agenda", label: "Agenda", icon: CalendarIcon },
   { href: "/dashboard/docs", label: "Documents", icon: FileIcon },
   { href: "/dashboard/billing", label: "Devis", icon: ReceiptIcon },
   { href: "/dashboard/tasks", label: "Tâches", icon: ChecksIcon },
+  { href: "/dashboard/abonnement", label: "Abonnement", icon: BoltIcon },
   { href: "/dashboard/settings", label: "Réglages", icon: GearIcon },
 ];
 

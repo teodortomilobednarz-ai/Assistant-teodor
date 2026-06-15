@@ -6,9 +6,11 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 > PostgreSQL (Prisma), first-run onboarding, a protected dashboard with a ⌘K command palette, and
 > the AI engine (Google Gemini) across **Gmail** (inbox search/filters/pagination, read-unread,
 > draft replies, **follow-ups**, archive), **Calendar** (day summary, create events, grouped by
-> day), **Drive** (recent files, search + summarize Docs), **quotes & invoices**, persisted
-> **tasks** (animated, with history), and **settings**. Toasts, skeletons, error boundaries.
-> Nothing is sent or created without an explicit user click.
+> day), **Drive** (recent files, search + summarize **all common formats** — Google Docs/Sheets/
+> Slides, PDF, images, text — via Gemini multimodal), **quotes & invoices**, persisted **tasks**
+> (animated, with history), **Stripe subscriptions** (Découverte / Essentiel 5€ / Pro 10€, hosted
+> Checkout + Customer Portal + webhook), and **settings**. Responsive mobile UI with a bottom tab
+> bar. Toasts, skeletons, error boundaries. Nothing is sent or created without an explicit user click.
 
 ## Project
 
@@ -58,9 +60,12 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   │   ├── docs/page.tsx          # Drive: recent files, search + summarize Docs
 │   │   ├── billing/              # Quotes & invoices (AI line items, printable PDF)
 │   │   ├── tasks/page.tsx         # Persisted tasks (animated, history)
+│   │   ├── abonnement/page.tsx    # Subscription: plans, Checkout, manage (portal)
 │   │   └── settings/page.tsx      # Account, business profile, Google connection
 │   ├── api/analyze/route.ts       # Analyze endpoint (+ persistence)
 │   ├── api/auth/[...nextauth]/    # Auth.js routes
+│   ├── api/stripe/webhook/route.ts # Stripe webhook → syncs subscription to DB
+│   ├── tarifs/page.tsx            # Public pricing page
 │   ├── privacy/page.tsx · terms/page.tsx  # Legal pages (Google OAuth verification)
 │   ├── icon.svg · apple-icon.svg  # Branded favicon + touch icon
 │   ├── error.tsx · not-found.tsx  # Error boundary + 404
@@ -72,9 +77,10 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   ├── google.ts                  # OAuth token refresh + isReconnectError
 │   ├── gmail.ts · calendar.ts · drive.ts  # Google API clients
 │   ├── billing-utils.ts · billing.ts      # Invoice helpers + AI line items
+│   ├── stripe.ts · plans.ts · subscription.ts  # Stripe client + plan catalogue + status
 │   ├── prisma.ts                  # Prisma client singleton
-│   ├── env.ts · schema.ts         # Validated env + Zod schemas
-│   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding)
+│   ├── env.ts · schema.ts         # Validated env (Gemini + Stripe) + Zod schemas
+│   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding, subscription)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
 ├── CLAUDE.md · ROLE.md · README.md
