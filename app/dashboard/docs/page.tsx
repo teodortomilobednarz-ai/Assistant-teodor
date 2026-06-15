@@ -10,7 +10,7 @@ export default function DocsPage() {
       <PageHeader
         icon={FileIcon}
         title="Documents"
-        description="Vos documents récents — recherchez-en un et obtenez son résumé en un clic."
+        description="Recherchez un document et obtenez son résumé. Inclus dès le plan Essentiel."
       />
       <DocsWorkspace />
     </main>

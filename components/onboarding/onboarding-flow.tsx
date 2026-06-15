@@ -17,8 +17,8 @@ const FEATURES = [
   { icon: MailIcon, title: "Boîte", desc: "Résume et répond à vos emails" },
   { icon: ReplyIcon, title: "Relances", desc: "Relance les emails sans réponse" },
   { icon: CalendarIcon, title: "Agenda", desc: "Résume votre journée" },
-  { icon: FileIcon, title: "Documents", desc: "Cherche et résume vos docs" },
-  { icon: ReceiptIcon, title: "Devis", desc: "Génère devis & factures" },
+  { icon: FileIcon, title: "Documents", desc: "Résume vos docs (dès Essentiel)" },
+  { icon: ReceiptIcon, title: "Devis", desc: "Devis & factures (dès Essentiel)" },
   { icon: ChecksIcon, title: "Tâches", desc: "Extrait et suit vos actions" },
 ];
 

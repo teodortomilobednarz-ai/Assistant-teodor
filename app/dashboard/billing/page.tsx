@@ -27,7 +27,7 @@ export default async function BillingPage() {
       <PageHeader
         icon={ReceiptIcon}
         title="Devis & factures"
-        description="Générez un devis ou une facture à partir d'une demande client — l'IA en déduit les lignes."
+        description="Générez un devis ou une facture à partir d'une demande client. Inclus dès le plan Essentiel."
       />
 
       <BillingWorkspace
