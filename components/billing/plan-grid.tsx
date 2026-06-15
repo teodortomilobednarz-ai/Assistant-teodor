@@ -39,7 +39,7 @@ export function PlanGrid({ cta }: { cta: (plan: Plan) => ReactNode }) {
           </div>
           {plan.priceYearly > 0 && (
             <p className="mt-1 text-xs text-muted">
-              ou {plan.priceYearly} € / an (2 mois offerts)
+              ou {formatPrice(plan.priceYearly)} / an (2 mois offerts)
             </p>
           )}
 

@@ -47,8 +47,8 @@ export const ESSENTIEL_PLAN: Plan = {
   tier: "essentiel",
   name: "Essentiel",
   tagline: "Pour les indépendants",
-  priceMonthly: 5,
-  priceYearly: 50, // 2 mois offerts
+  priceMonthly: 4.99,
+  priceYearly: 49.9, // ~2 mois offerts
   features: [
     "Analyses IA illimitées",
     "Résumés d'emails et de Google Docs",
@@ -63,8 +63,8 @@ export const PRO_PLAN: Plan = {
   tier: "pro",
   name: "Pro",
   tagline: "Pour les PME qui veulent tout automatiser",
-  priceMonthly: 10,
-  priceYearly: 100, // 2 mois offerts
+  priceMonthly: 9.99,
+  priceYearly: 99.9, // ~2 mois offerts
   highlight: true,
   features: [
     "Tout le plan Essentiel",
@@ -83,5 +83,9 @@ export function planById(id: PlanId): Plan {
 }
 
 export function formatPrice(euros: number): string {
-  return euros === 0 ? "Gratuit" : `${euros} €`;
+  if (euros === 0) return "Gratuit";
+  const value = Number.isInteger(euros)
+    ? String(euros)
+    : euros.toFixed(2).replace(".", ",");
+  return `${value} €`;
 }
