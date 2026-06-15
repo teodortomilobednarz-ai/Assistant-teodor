@@ -18,6 +18,9 @@ export function getStripe(): Stripe {
       // Be resilient to transient serverless ↔ Stripe network blips.
       maxNetworkRetries: 3,
       timeout: 20_000,
+      // Use the fetch-based HTTP client: the default Node client can fail to
+      // connect from Vercel's serverless runtime.
+      httpClient: Stripe.createFetchHttpClient(),
     });
   }
   return client;
