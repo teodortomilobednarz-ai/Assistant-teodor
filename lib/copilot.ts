@@ -1,6 +1,13 @@
 import "server-only";
 
-import { Type, type Schema } from "@google/genai";
+import {
+  createPartFromUri,
+  createUserContent,
+  FileState,
+  Type,
+  type Part,
+  type Schema,
+} from "@google/genai";
 
 import { getGeminiClient } from "./gemini";
 import { analysisSchema, type AnalyzeRequest, type Analysis } from "./schema";
@@ -97,32 +104,61 @@ export async function summarize(opts: {
   return text.trim();
 }
 
-const DOC_INSTRUCTION = `Tu es un assistant pour dirigeant de PME. Résume le document fourni en français : commence par 3 à 5 phrases pour l'essentiel, puis liste les points clés en puces. Si le document contient des chiffres, dates ou montants importants, mets-les en avant. Sois clair, concis et fidèle au document.`;
+const DOC_INSTRUCTION = `Tu es un assistant pour dirigeant de PME. Résume le document ou le média fourni : commence par 3 à 5 phrases pour l'essentiel, puis liste les points clés en puces. Pour un audio ou une vidéo, restitue les points principaux abordés. Si le contenu comporte des chiffres, dates ou montants importants, mets-les en avant. Réponds dans la langue dominante du contenu (ou en français si indéterminé). Sois clair, concis et fidèle.`;
+
+/** Below this size, media is sent inline; above it, via the Files API. */
+const INLINE_LIMIT = 15 * 1024 * 1024;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * Summarizes a document supplied either as extracted text or as raw bytes
- * (PDF, image) read natively by the multimodal model.
+ * Summarizes a document supplied as extracted text or as raw media bytes
+ * (PDF, image, audio, video). Small media is sent inline; larger media is
+ * uploaded via the Gemini Files API (handles long audio/video).
  */
 export async function summarizeDocument(
   part:
     | { kind: "text"; text: string }
-    | { kind: "inline"; mimeType: string; data: string },
+    | { kind: "media"; mimeType: string; bytes: Buffer },
 ): Promise<string> {
   const client = getGeminiClient();
 
-  const contentPart =
-    part.kind === "text"
-      ? { text: part.text.slice(0, 40_000) }
-      : { inlineData: { mimeType: part.mimeType, data: part.data } };
+  let contentPart: Part;
+  if (part.kind === "text") {
+    contentPart = { text: part.text.slice(0, 40_000) };
+  } else if (part.bytes.byteLength <= INLINE_LIMIT) {
+    contentPart = {
+      inlineData: {
+        mimeType: part.mimeType,
+        data: part.bytes.toString("base64"),
+      },
+    };
+  } else {
+    // Large media: upload, wait until processed, then reference by URI.
+    const blob = new Blob([new Uint8Array(part.bytes)], {
+      type: part.mimeType,
+    });
+    let file = await client.files.upload({
+      file: blob,
+      config: { mimeType: part.mimeType },
+    });
+
+    for (let i = 0; i < 30 && file.state === FileState.PROCESSING; i++) {
+      await sleep(2000);
+      file = await client.files.get({ name: file.name! });
+    }
+    if (file.state === FileState.FAILED || !file.uri || !file.mimeType) {
+      throw new Error("MEDIA_PROCESSING_FAILED");
+    }
+    contentPart = createPartFromUri(file.uri, file.mimeType);
+  }
 
   const response = await client.models.generateContent({
     model: MODEL,
-    contents: [
-      {
-        role: "user",
-        parts: [contentPart, { text: "Résume ce document." }],
-      },
-    ],
+    contents: createUserContent([
+      contentPart,
+      { text: "Résume ce contenu." },
+    ]),
     config: {
       systemInstruction: DOC_INSTRUCTION,
       temperature: 0.4,

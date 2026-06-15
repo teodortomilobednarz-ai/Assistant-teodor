@@ -15,7 +15,28 @@ function fileKind(mimeType: string): string {
   if (mimeType === "application/vnd.google-apps.presentation") return "Slides";
   if (mimeType === "application/vnd.google-apps.folder") return "Dossier";
   if (mimeType === "application/pdf") return "PDF";
+  if (
+    mimeType ===
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+    return "Word";
+  if (
+    mimeType ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    mimeType === "application/vnd.ms-excel"
+  )
+    return "Excel";
+  if (
+    mimeType ===
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  )
+    return "PowerPoint";
+  if (mimeType.startsWith("application/vnd.oasis.opendocument")) return "OpenDocument";
+  if (mimeType === "application/zip" || mimeType === "application/x-zip-compressed")
+    return "Archive";
   if (mimeType.startsWith("image/")) return "Image";
+  if (mimeType.startsWith("video/")) return "Vidéo";
+  if (mimeType.startsWith("audio/")) return "Audio";
   return "Fichier";
 }
 
@@ -100,9 +121,12 @@ export function DocsWorkspace() {
           <SparklesIcon className="size-4" />
         </span>
         <p className="text-sm leading-relaxed text-foreground">
-          Draidly lit vos <strong>Google Docs, Sheets, Slides, PDF, images</strong>{" "}
-          et fichiers texte. Les fichiers Office, vidéos et archives arrivent
-          bientôt.
+          Draidly lit{" "}
+          <strong>
+            tous vos fichiers : Google Docs, Word, Excel, PowerPoint, PDF,
+            images, audio, vidéos et archives
+          </strong>{" "}
+          — et en fait un résumé clair.
         </p>
       </div>
 

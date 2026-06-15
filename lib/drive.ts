@@ -1,8 +1,10 @@
 import "server-only";
 
+import { ARCHIVE_MIMES, extractOfficeText, OFFICE_MIMES } from "./office";
+
 /**
  * Minimal Google Drive REST client (fetch + user access token).
- * Searches files and extracts the text of Google Docs for summarization.
+ * Searches files and extracts content of any common format for summarization.
  */
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
@@ -15,21 +17,35 @@ const EXPORT_AS_TEXT: Record<string, string> = {
   "application/vnd.google-apps.spreadsheet": "text/csv",
 };
 
-/** Largest file we will download for analysis (Gemini inline limit ~20 MB). */
-const MAX_BYTES = 18 * 1024 * 1024;
+/** Largest file we download into memory for analysis. */
+const MAX_BYTES = 50 * 1024 * 1024;
+
+/** True for media the multimodal model reads directly (PDF, image, audio, video). */
+function isMedia(mimeType: string): boolean {
+  return (
+    mimeType === "application/pdf" ||
+    mimeType.startsWith("image/") ||
+    mimeType.startsWith("audio/") ||
+    mimeType.startsWith("video/")
+  );
+}
+
+function isPlainText(mimeType: string): boolean {
+  return mimeType.startsWith("text/") || mimeType === "application/json";
+}
 
 /**
- * Whether Draidly can currently read/summarize this file:
- * Google Docs/Sheets/Slides (export), PDFs & images (Gemini multimodal),
- * and plain-text formats. Office binaries / video / archives are not yet supported.
+ * Whether Draidly can read/summarize this file. Covers Google Docs/Sheets/
+ * Slides, Office (Word/Excel/PowerPoint/OpenDocument), PDFs, images, audio,
+ * video, plain text and archives — i.e. essentially everything common.
  */
 export function isSummarizable(mimeType: string): boolean {
   return (
     mimeType in EXPORT_AS_TEXT ||
-    mimeType === "application/pdf" ||
-    mimeType.startsWith("image/") ||
-    mimeType.startsWith("text/") ||
-    mimeType === "application/json"
+    isMedia(mimeType) ||
+    isPlainText(mimeType) ||
+    OFFICE_MIMES.has(mimeType) ||
+    ARCHIVE_MIMES.has(mimeType)
   );
 }
 
@@ -119,18 +135,18 @@ export async function listRecentFiles(
 }
 
 /**
- * Content ready to hand to the LLM: either extracted text, or raw bytes
- * (base64) for multimodal models (PDF, images).
+ * Content ready to hand to the LLM: extracted text, or raw media bytes
+ * (PDF, image, audio, video) read directly by the multimodal model.
  */
 export type FileContent =
   | { kind: "text"; text: string }
-  | { kind: "inline"; mimeType: string; data: string };
+  | { kind: "media"; mimeType: string; bytes: Buffer };
 
 /**
- * Fetches a file's content for analysis. Google-native files are exported to
- * text; PDFs and images are downloaded as bytes (read natively by Gemini);
- * plain-text formats are downloaded as UTF-8. Throws UNSUPPORTED_FILE_TYPE for
- * anything Draidly can't yet read (the caller surfaces a friendly message).
+ * Fetches a file's content for analysis. Google-native files export to text;
+ * Office docs & archives are parsed to text; PDFs/images/audio/video download
+ * as bytes for the multimodal model; plain text decodes as UTF-8. Throws
+ * UNSUPPORTED_FILE_TYPE / FILE_TOO_LARGE for the caller to surface kindly.
  */
 export async function getFileContent(
   accessToken: string,
@@ -170,11 +186,16 @@ export async function getFileContent(
     throw new Error("FILE_TOO_LARGE");
   }
 
+  // Office documents & archives → extract text.
+  if (OFFICE_MIMES.has(mimeType) || ARCHIVE_MIMES.has(mimeType)) {
+    return { kind: "text", text: await extractOfficeText(buffer, mimeType) };
+  }
+
   // Plain-text formats → decode as UTF-8.
-  if (mimeType.startsWith("text/") || mimeType === "application/json") {
+  if (isPlainText(mimeType)) {
     return { kind: "text", text: buffer.toString("utf-8") };
   }
 
-  // PDF / images → base64 for the multimodal model.
-  return { kind: "inline", mimeType, data: buffer.toString("base64") };
+  // PDF / image / audio / video → raw bytes for the multimodal model.
+  return { kind: "media", mimeType, bytes: buffer };
 }

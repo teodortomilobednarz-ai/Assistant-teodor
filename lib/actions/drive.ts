@@ -88,14 +88,19 @@ export async function summarizeDoc(
     if (code === "UNSUPPORTED_FILE_TYPE") {
       return {
         ok: false,
-        error:
-          "Ce type de fichier n'est pas encore pris en charge (Office, vidéo, archive).",
+        error: "Ce type de fichier n'est pas pris en charge.",
       };
     }
     if (code === "FILE_TOO_LARGE") {
       return {
         ok: false,
-        error: "Ce fichier est trop volumineux pour être analysé (max ~18 Mo).",
+        error: "Ce fichier est trop volumineux pour être analysé (max 50 Mo).",
+      };
+    }
+    if (code === "MEDIA_PROCESSING_FAILED") {
+      return {
+        ok: false,
+        error: "Ce média n'a pas pu être traité. Réessaie dans un instant.",
       };
     }
     if (isReconnectError(error)) {
