@@ -44,6 +44,13 @@ export default async function AbonnementPage({
           Paiement annulé — aucun montant n&apos;a été prélevé.
         </div>
       )}
+      {outcome === "error" && (
+        <div className="rounded-2xl border border-danger/30 bg-danger-surface p-4 text-sm text-foreground">
+          Le paiement n&apos;a pas pu démarrer. Vérifiez que les prix Stripe
+          existent bien en mode <strong>live</strong> (pas seulement en test) et
+          que les variables sont configurées. Réessayez dans un instant.
+        </div>
+      )}
 
       {/* Current plan summary */}
       <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">

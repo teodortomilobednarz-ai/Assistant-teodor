@@ -46,23 +46,32 @@ export async function startCheckout(
   const userId = session?.user?.id;
   if (!userId) redirect("/");
 
-  const { appUrl } = getStripeEnv();
-  const customerId = await ensureCustomer(userId, session.user.email ?? null);
+  let url: string | null = null;
+  try {
+    const { appUrl } = getStripeEnv();
+    const customerId = await ensureCustomer(userId, session.user.email ?? null);
 
-  const checkout = await getStripe().checkout.sessions.create({
-    mode: "subscription",
-    customer: customerId,
-    line_items: [{ price: priceIdFor(tier, interval), quantity: 1 }],
-    allow_promotion_codes: true,
-    billing_address_collection: "auto",
-    success_url: `${appUrl}/dashboard/abonnement?status=success`,
-    cancel_url: `${appUrl}/dashboard/abonnement?status=cancel`,
-    subscription_data: { metadata: { userId } },
-    metadata: { userId },
-  });
+    const checkout = await getStripe().checkout.sessions.create({
+      mode: "subscription",
+      customer: customerId,
+      line_items: [{ price: priceIdFor(tier, interval), quantity: 1 }],
+      allow_promotion_codes: true,
+      billing_address_collection: "auto",
+      success_url: `${appUrl}/dashboard/abonnement?status=success`,
+      cancel_url: `${appUrl}/dashboard/abonnement?status=cancel`,
+      subscription_data: { metadata: { userId } },
+      metadata: { userId },
+    });
+    url = checkout.url;
+  } catch (error) {
+    // Log the real Stripe error (visible in Vercel function logs) and surface a
+    // clean message instead of crashing the UI.
+    console.error("[startCheckout] failed:", error);
+    redirect("/dashboard/abonnement?status=error");
+  }
 
-  if (!checkout.url) throw new Error("Stripe checkout URL manquante.");
-  redirect(checkout.url);
+  if (!url) redirect("/dashboard/abonnement?status=error");
+  redirect(url);
 }
 
 /**
