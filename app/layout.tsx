@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { ToastProvider } from "@/components/ui/toast";
@@ -37,6 +37,10 @@ export const metadata: Metadata = {
     title: "Draidly — l'assistant IA pour PME",
     description: DESCRIPTION,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#6d5cf0",
 };
 
 export default function RootLayout({
