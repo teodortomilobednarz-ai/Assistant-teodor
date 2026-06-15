@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { Analyzer } from "@/components/copilot/analyzer";
 import { DaySummary } from "@/components/copilot/day-summary";
+import { DailyBrief } from "@/components/dashboard/daily-brief";
 import { PriorityBadge } from "@/components/copilot/priority-badge";
 import {
   ArrowRightIcon,
@@ -100,6 +101,11 @@ export default async function DashboardPage() {
         <p className="mt-1.5 text-muted">
           Voici votre centre de contrôle. Que voulez-vous déléguer aujourd&apos;hui ?
         </p>
+      </div>
+
+      {/* AI morning brief */}
+      <div className="animate-fade-up delay-1">
+        <DailyBrief />
       </div>
 
       {/* Stats */}

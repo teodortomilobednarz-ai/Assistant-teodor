@@ -6,11 +6,13 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 > PostgreSQL (Prisma), first-run onboarding, a protected dashboard with a ⌘K command palette, and
 > the AI engine (Google Gemini) across **Gmail** (inbox search/filters/pagination, read-unread,
 > draft replies, **follow-ups**, archive), **Calendar** (day summary, create events, grouped by
-> day), **Drive** (recent files, search + summarize **all common formats** — Google Docs/Sheets/
-> Slides, PDF, images, text — via Gemini multimodal), **quotes & invoices**, persisted **tasks**
-> (animated, with history), **Stripe subscriptions** (Découverte / Essentiel 5€ / Pro 10€, hosted
-> Checkout + Customer Portal + webhook), and **settings**. Responsive mobile UI with a bottom tab
-> bar. Toasts, skeletons, error boundaries. Nothing is sent or created without an explicit user click.
+> day), **Drive** (recent files, search + summarize **any file type** — Google Docs/Sheets/Slides,
+> Word/Excel/PowerPoint/OpenDocument, PDF, images, audio, video via Gemini Files API, archives),
+> a **daily AI brief** ("Ma journée"), **quotes & invoices**, persisted **tasks** (animated, with
+> history), **Stripe subscriptions** (Découverte / Essentiel 5€ / Pro 10€, hosted Checkout +
+> Customer Portal + webhook), and **settings**. The AI is **multilingual** (replies in the email's
+> language). Responsive mobile UI with a bottom tab bar. Toasts, skeletons, error boundaries.
+> Nothing is sent or created without an explicit user click.
 
 ## Project
 
@@ -73,14 +75,15 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 ├── auth.ts                        # Auth.js (NextAuth v5) config (persists OAuth tokens on sign-in)
 ├── components/                    # UI: copilot/, inbox/, billing/, dashboard/, settings/, etc.
 ├── lib/
-│   ├── gemini.ts · copilot.ts     # AI engine (Gemini) + core logic
+│   ├── gemini.ts · copilot.ts     # AI engine (Gemini) + core logic (multilingual, multimodal)
+│   ├── office.ts                  # Office/archive text extraction (Word/Excel/PPT/OpenDoc/zip)
 │   ├── google.ts                  # OAuth token refresh + isReconnectError
 │   ├── gmail.ts · calendar.ts · drive.ts  # Google API clients
 │   ├── billing-utils.ts · billing.ts      # Invoice helpers + AI line items
 │   ├── stripe.ts · plans.ts · subscription.ts  # Stripe client + plan catalogue + status
 │   ├── prisma.ts                  # Prisma client singleton
 │   ├── env.ts · schema.ts         # Validated env (Gemini + Stripe) + Zod schemas
-│   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding, subscription)
+│   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding, subscription, brief)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
 ├── CLAUDE.md · ROLE.md · README.md
