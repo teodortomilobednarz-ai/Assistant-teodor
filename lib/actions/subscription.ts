@@ -64,10 +64,15 @@ export async function startCheckout(
     });
     url = checkout.url;
   } catch (error) {
-    // Log the real Stripe error (visible in Vercel function logs) and surface a
-    // clean message instead of crashing the UI.
+    // Log the real Stripe error (Vercel logs) AND surface it on the page so the
+    // owner can see the exact cause without digging into dashboards.
     console.error("[startCheckout] failed:", error);
-    redirect("/dashboard/abonnement?status=error");
+    const reason = error instanceof Error ? error.message : "Erreur inconnue";
+    redirect(
+      `/dashboard/abonnement?status=error&reason=${encodeURIComponent(
+        reason.slice(0, 300),
+      )}`,
+    );
   }
 
   if (!url) redirect("/dashboard/abonnement?status=error");

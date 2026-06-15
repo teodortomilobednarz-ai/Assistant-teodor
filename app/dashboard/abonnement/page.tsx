@@ -12,12 +12,12 @@ export const dynamic = "force-dynamic";
 export default async function AbonnementPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; reason?: string }>;
 }) {
   const session = await auth();
   const userId = session!.user.id;
   const status = await getSubscriptionStatus(userId);
-  const { status: outcome } = await searchParams;
+  const { status: outcome, reason } = await searchParams;
 
   const current = planById(status.plan);
   const periodEnd = status.currentPeriodEnd?.toLocaleDateString("fr-FR", {
@@ -46,9 +46,16 @@ export default async function AbonnementPage({
       )}
       {outcome === "error" && (
         <div className="rounded-2xl border border-danger/30 bg-danger-surface p-4 text-sm text-foreground">
-          Le paiement n&apos;a pas pu démarrer. Vérifiez que les prix Stripe
-          existent bien en mode <strong>live</strong> (pas seulement en test) et
-          que les variables sont configurées. Réessayez dans un instant.
+          <p className="font-semibold">Le paiement n&apos;a pas pu démarrer.</p>
+          {reason && (
+            <p className="mt-2 break-words font-mono text-xs text-danger">
+              {reason}
+            </p>
+          )}
+          <p className="mt-2 text-muted">
+            Vérifiez que les prix Stripe existent en mode <strong>live</strong> et
+            que votre compte Stripe est activé pour les paiements.
+          </p>
         </div>
       )}
 
