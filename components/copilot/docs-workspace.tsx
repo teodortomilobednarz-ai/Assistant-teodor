@@ -121,9 +121,10 @@ export function DocsWorkspace() {
           <SparklesIcon className="size-4" />
         </span>
         <p className="text-sm leading-relaxed text-foreground">
-          Draidly résume vos <strong>documents, PDF et images</strong>. La
-          lecture des fichiers <strong>Office, audio, vidéo et archives</strong>{" "}
-          est incluse dans le <strong>plan Pro</strong>.
+          La lecture de documents nécessite un{" "}
+          <strong>abonnement (Essentiel ou Pro)</strong>. Les fichiers{" "}
+          <strong>Office, audio, vidéo et archives</strong> sont inclus dans le{" "}
+          <strong>plan Pro</strong>.
         </p>
       </div>
 

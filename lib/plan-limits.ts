@@ -13,14 +13,31 @@ export interface PlanLimits {
   analysesPerDay: number | null;
   /** Max quotes/invoices generated per month (null = unlimited). */
   invoicesPerMonth: number | null;
+  /** Whether documents can be read at all (Docs, PDF, images…). Paid only. */
+  standardDocs: boolean;
   /** Whether heavy file types (Office, audio, video, archives) can be read. */
   advancedDocs: boolean;
 }
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
-  free: { analysesPerDay: 5, invoicesPerMonth: 0, advancedDocs: false },
-  essentiel: { analysesPerDay: null, invoicesPerMonth: 10, advancedDocs: false },
-  pro: { analysesPerDay: null, invoicesPerMonth: null, advancedDocs: true },
+  free: {
+    analysesPerDay: 5,
+    invoicesPerMonth: 0,
+    standardDocs: false,
+    advancedDocs: false,
+  },
+  essentiel: {
+    analysesPerDay: null,
+    invoicesPerMonth: 10,
+    standardDocs: true,
+    advancedDocs: false,
+  },
+  pro: {
+    analysesPerDay: null,
+    invoicesPerMonth: null,
+    standardDocs: true,
+    advancedDocs: true,
+  },
 };
 
 export function limitsFor(plan: PlanId): PlanLimits {

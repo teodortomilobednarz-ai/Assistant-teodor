@@ -52,8 +52,11 @@ export async function checkInvoiceQuota(userId: string): Promise<QuotaCheck> {
   return { allowed: used < limit, plan, used, limit };
 }
 
-/** Whether the user's plan can read heavy file types (Office, audio, video, zip). */
-export async function canReadAdvancedDocs(userId: string): Promise<boolean> {
+/** What document types the user's plan may read. */
+export async function getDocAccess(
+  userId: string,
+): Promise<{ standard: boolean; advanced: boolean }> {
   const { plan } = await getSubscriptionStatus(userId);
-  return limitsFor(plan).advancedDocs;
+  const limits = limitsFor(plan);
+  return { standard: limits.standardDocs, advanced: limits.advancedDocs };
 }

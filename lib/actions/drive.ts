@@ -10,7 +10,7 @@ import {
   type DriveFile,
 } from "@/lib/drive";
 import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
-import { canReadAdvancedDocs } from "@/lib/usage";
+import { getDocAccess } from "@/lib/usage";
 
 async function requireToken(): Promise<string> {
   const session = await auth();
@@ -75,17 +75,26 @@ export async function summarizeDoc(
   mimeType: string,
 ): Promise<DocSummaryResult> {
   try {
-    // Heavy file types (Office, audio, video, archives) are Pro-only.
-    if (isAdvancedDoc(mimeType)) {
-      const session = await auth();
-      const userId = session?.user?.id;
-      if (!userId || !(await canReadAdvancedDocs(userId))) {
-        return {
-          ok: false,
-          error:
-            "La lecture des fichiers Office, audio, vidéo et archives est réservée au plan Pro.",
-        };
-      }
+    // Document reading is a paid feature; advanced file types are Pro-only.
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return { ok: false, error: "Non authentifié." };
+    }
+    const access = await getDocAccess(userId);
+    if (!access.standard) {
+      return {
+        ok: false,
+        error:
+          "La lecture et le résumé de documents nécessitent un abonnement (Essentiel ou Pro).",
+      };
+    }
+    if (isAdvancedDoc(mimeType) && !access.advanced) {
+      return {
+        ok: false,
+        error:
+          "La lecture des fichiers Office, audio, vidéo et archives est réservée au plan Pro.",
+      };
     }
 
     const accessToken = await requireToken();
