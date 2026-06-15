@@ -5,10 +5,14 @@ il **résume** les emails, **prépare les réponses**, **crée les tâches** et
 **retrouve les informations**. Moteur : **Google Gemini** (palier gratuit).
 Domaine cible : `draidly.app`.
 
-> **Statut : Palier 1 (fondation).** Application multi-utilisateurs : comptes
-> (connexion Google), base de données, tableau de bord, et analyse de texte dont
-> les tâches/analyses sont **sauvegardées** par utilisateur. Les connexions Gmail,
-> agenda et documents arrivent aux paliers suivants.
+> **Statut : SaaS (bêta).** Application complète multi-utilisateurs : connexion
+> Google, onboarding, tableau de bord avec palette ⌘K, **Gmail** (boîte,
+> recherche, brouillons, envoi, relances, archivage), **Agenda**, **Drive**
+> (lecture de tout type de fichier — Office, PDF, images, audio, vidéo,
+> archives), **recherche IA universelle**, brief quotidien « Ma journée »,
+> **devis & factures**, **tâches**, **abonnements Stripe** (Découverte /
+> Essentiel / Pro avec limites appliquées), IA **multilingue**, et pages légales
+> prêtes pour la vérification Google OAuth. Rien n'est envoyé sans clic explicite.
 
 ## Stack
 
