@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo, LogoMark } from "@/components/brand/logo";
 import { CommandPalette } from "@/components/dashboard/command-palette";
+import { CommandTrigger } from "@/components/dashboard/command-trigger";
 import { NavLinks } from "@/components/dashboard/nav-links";
 import { prisma } from "@/lib/prisma";
 
@@ -52,6 +53,9 @@ export default async function DashboardLayout({
       <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface/40 lg:sticky lg:top-0 lg:flex lg:h-dvh print:hidden">
         <div className="px-5 py-4">
           <Logo />
+        </div>
+        <div className="px-3 pb-2">
+          <CommandTrigger />
         </div>
         <div className="flex-1 px-3">
           <NavLinks vertical />
