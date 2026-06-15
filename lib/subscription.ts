@@ -18,14 +18,26 @@ export interface SubscriptionStatus {
 export async function getSubscriptionStatus(
   userId: string,
 ): Promise<SubscriptionStatus> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      stripeCustomerId: true,
-      stripeCurrentPeriodEnd: true,
-      stripePriceId: true,
-    },
-  });
+  let user: {
+    stripeCustomerId: string | null;
+    stripeCurrentPeriodEnd: Date | null;
+    stripePriceId: string | null;
+  } | null = null;
+
+  try {
+    user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        stripeCustomerId: true,
+        stripeCurrentPeriodEnd: true,
+        stripePriceId: true,
+      },
+    });
+  } catch (error) {
+    // e.g. billing columns not migrated yet — treat as the free plan.
+    console.error("[getSubscriptionStatus] failed:", error);
+    return { active: false, plan: "free", currentPeriodEnd: null, hasCustomer: false };
+  }
 
   const end = user?.stripeCurrentPeriodEnd ?? null;
   const active = end !== null && end.getTime() > Date.now();
