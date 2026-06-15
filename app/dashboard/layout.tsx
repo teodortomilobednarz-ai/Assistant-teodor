@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo, LogoMark } from "@/components/brand/logo";
 import { NavLinks } from "@/components/dashboard/nav-links";
+import { prisma } from "@/lib/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -16,6 +17,15 @@ export default async function DashboardLayout({
   // Route protection: unauthenticated visitors are sent to the landing page.
   if (!session?.user) {
     redirect("/");
+  }
+
+  // First-run: send new users through onboarding once.
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { onboardedAt: true },
+  });
+  if (!dbUser?.onboardedAt) {
+    redirect("/onboarding");
   }
 
   const { name, email, image } = session.user;

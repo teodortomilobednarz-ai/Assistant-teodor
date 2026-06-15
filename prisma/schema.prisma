@@ -20,6 +20,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  onboardedAt   DateTime?
 
   accounts  Account[]
   sessions  Session[]
