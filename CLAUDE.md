@@ -69,7 +69,7 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   ├── api/auth/[...nextauth]/    # Auth.js routes
 │   ├── api/stripe/webhook/route.ts # Stripe webhook → syncs subscription to DB
 │   ├── tarifs/page.tsx            # Public pricing page
-│   ├── privacy/page.tsx · terms/page.tsx  # Legal pages (Google OAuth verification)
+│   ├── privacy/page.tsx · terms/page.tsx · mentions-legales/page.tsx  # Legal (Google OAuth + FR)
 │   ├── icon.svg · apple-icon.svg  # Branded favicon + touch icon
 │   ├── error.tsx · not-found.tsx  # Error boundary + 404
 │   └── layout.tsx · globals.css   # Root layout (ToastProvider, metadata) + design tokens
@@ -87,7 +87,7 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding, subscription, brief)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
-├── CLAUDE.md · ROLE.md · README.md
+├── CLAUDE.md · ROLE.md · README.md · VERIFICATION.md  # (+ Google OAuth submission guide)
 ```
 
 Keep this map accurate as the structure evolves — it is the first thing an assistant reads to
