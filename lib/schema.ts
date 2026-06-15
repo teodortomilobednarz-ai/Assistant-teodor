@@ -24,7 +24,7 @@ export const analysisSchema = z.object({
   summary: z.string(),
   /** Bullet-point highlights. */
   keyPoints: z.array(z.string()),
-  /** A ready-to-edit draft reply, written in French. */
+  /** A ready-to-edit draft reply, written in the analyzed message's language. */
   suggestedReply: z.string(),
   /** Actionable tasks extracted from the content. */
   tasks: z.array(taskSchema),

@@ -65,7 +65,13 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const analysis = await analyzeContent(parsed.data);
+    // Owner UI language (for summary/keypoints) from the browser; the draft
+    // reply itself is always written in the analyzed message's language.
+    const acceptLanguage = request.headers.get("accept-language") ?? "";
+    const ownerLanguage =
+      acceptLanguage.split(",")[0]?.split(";")[0]?.trim() || "fr";
+
+    const analysis = await analyzeContent(parsed.data, ownerLanguage);
 
     const session = await auth();
     if (session?.user?.id) {

@@ -47,18 +47,29 @@ const RESPONSE_SCHEMA: Schema = {
   propertyOrdering: ["summary", "keyPoints", "suggestedReply", "tasks", "answer"],
 };
 
-const SYSTEM_PROMPT = `Tu es un copilote IA pour dirigeants de PME et indépendants.
+const SYSTEM_PROMPT = `Tu es un copilote IA pour dirigeants de PME et indépendants, partout dans le monde.
 À partir d'un texte fourni (le plus souvent un email reçu), tu produis une analyse claire et directement exploitable.
 
+LANGUES (très important — produit international) :
+- "summary", "keyPoints", "answer" et les titres de "tasks" : écris-les dans la langue de l'utilisateur, dont le code est "{OWNER_LANGUAGE}". Si ce code est vide ou inconnu, utilise la langue du texte analysé.
+- "suggestedReply" : écris-le IMPÉRATIVEMENT dans la MÊME LANGUE que le texte analysé (le message reçu). Exemple : un email en polonais → brouillon de réponse en polonais ; un email en anglais → réponse en anglais.
+
 Règles :
-- Réponds toujours en français, dans un style clair, simple et professionnel.
+- Style clair, simple et professionnel.
 - "summary" : 2 à 4 phrases qui capturent l'essentiel.
 - "keyPoints" : les points importants, sous forme de courtes puces.
-- "suggestedReply" : un brouillon de réponse prêt à être édité et envoyé. Ton professionnel et courtois. N'invente jamais d'engagement, de prix ou de date que le texte ne mentionne pas ; en cas d'information manquante, laisse un court champ entre crochets (ex. [à compléter]).
+- "suggestedReply" : un brouillon de réponse prêt à être édité et envoyé. Ton professionnel et courtois. N'invente jamais d'engagement, de prix ou de date que le texte ne mentionne pas ; en cas d'information manquante, laisse un court champ entre crochets (ex. [à compléter] / [to complete], traduit dans la langue de la réponse).
 - "tasks" : les actions concrètes à faire. Pour chaque tâche : un titre court et actionnable, une priorité ("haute", "moyenne" ou "basse"), et "dueDate" au format AAAA-MM-JJ si une échéance est explicitement mentionnée, sinon null. S'il n'y a aucune tâche, renvoie une liste vide.
 - "answer" : si une question est posée par l'utilisateur, réponds-y en t'appuyant uniquement sur le texte fourni ; sinon null. Si la réponse n'est pas dans le texte, dis-le clairement.
 
+Note : les valeurs de "priority" restent toujours "haute", "moyenne" ou "basse" (en français), quelle que soit la langue.
+
 Tu ne fais que préparer et proposer : tu n'envoies rien et ne prends aucune action externe.`;
+
+/** Builds the system prompt for a given owner UI language (BCP-47 subtag). */
+function buildSystemPrompt(ownerLanguage: string): string {
+  return SYSTEM_PROMPT.replace("{OWNER_LANGUAGE}", ownerLanguage || "");
+}
 
 /**
  * Generic plain-text generation (e.g. day summary, document summary).
@@ -125,7 +136,10 @@ export async function summarizeDocument(
   return text.trim();
 }
 
-export async function analyzeContent(input: AnalyzeRequest): Promise<Analysis> {
+export async function analyzeContent(
+  input: AnalyzeRequest,
+  ownerLanguage = "fr",
+): Promise<Analysis> {
   const client = getGeminiClient();
 
   const question = input.question?.trim();
@@ -144,7 +158,7 @@ export async function analyzeContent(input: AnalyzeRequest): Promise<Analysis> {
     model: MODEL,
     contents: userPrompt,
     config: {
-      systemInstruction: SYSTEM_PROMPT,
+      systemInstruction: buildSystemPrompt(ownerLanguage),
       responseMimeType: "application/json",
       responseSchema: RESPONSE_SCHEMA,
       temperature: 0.4,

@@ -67,7 +67,7 @@ export async function createFollowUp(
     const accessToken = await getValidGoogleAccessToken(userId);
     const body = await summarize({
       instruction:
-        "Tu écris une relance courtoise et brève (3 à 4 phrases maximum), en français, pour relancer poliment un email resté sans réponse. Ton professionnel, jamais insistant. Ne réécris pas tout l'historique. Termine par une formule de politesse. N'invente aucune information.",
+        "Tu écris une relance courtoise et brève (3 à 4 phrases maximum) pour relancer poliment un email resté sans réponse. IMPORTANT : écris la relance dans la MÊME LANGUE que l'objet et le dernier message fournis (par ex. anglais → relance en anglais, polonais → en polonais). Ton professionnel, jamais insistant. Ne réécris pas tout l'historique. Termine par une formule de politesse adaptée à la langue. N'invente aucune information.",
       content: `Objet : ${subjectRaw}\nDestinataire : ${to}\nDernier message envoyé (extrait) : ${context}`,
     });
 

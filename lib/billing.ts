@@ -27,7 +27,8 @@ const ITEMS_SCHEMA: Schema = {
   required: ["items"],
 };
 
-const SYSTEM_PROMPT = `Tu génères les lignes d'un devis ou d'une facture à partir d'une demande client, en français.
+const SYSTEM_PROMPT = `Tu génères les lignes d'un devis ou d'une facture à partir d'une demande client.
+IMPORTANT : rédige chaque "description" dans la MÊME LANGUE que la demande fournie (anglais → descriptions en anglais, polonais → en polonais, etc.).
 Pour chaque prestation ou produit : "description" claire, "quantity" (nombre, 1 par défaut), "unitPrice" (prix unitaire HT en euros).
 Si un prix n'est pas indiqué dans la demande, propose une estimation raisonnable et cohérente pour une PME. Renvoie toujours au moins une ligne.`;
 
