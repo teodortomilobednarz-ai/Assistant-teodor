@@ -92,7 +92,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
       <div className="animate-fade-up">
         <h1 className="text-3xl font-semibold tracking-tight">
           Bonjour{firstName ? ` ${firstName}` : ""} 👋
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
           <Link
             key={href}
             href={href}
-            className="group card-glow glow-hover flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5"
+            className="group card-glow glow-hover flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-all active:scale-[0.98] hover:-translate-y-0.5"
           >
             <span className="bg-gradient-accent flex size-9 items-center justify-center rounded-xl text-white shadow-sm">
               <Icon className="size-4" />

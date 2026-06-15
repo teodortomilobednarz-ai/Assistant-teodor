@@ -112,6 +112,25 @@ export function ReplyIcon({ className = "size-5" }: IconProps) {
   );
 }
 
+export function HomeIcon({ className = "size-5" }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <path d="M4 11.5 12 4l8 7.5" />
+      <path d="M5.5 10.5V19a1 1 0 0 0 1 1H10v-4.5h4V20h3.5a1 1 0 0 0 1-1v-8.5" />
+    </svg>
+  );
+}
+
+export function MoreIcon({ className = "size-5" }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <circle cx="5" cy="12" r="1.4" />
+      <circle cx="12" cy="12" r="1.4" />
+      <circle cx="19" cy="12" r="1.4" />
+    </svg>
+  );
+}
+
 export function GearIcon({ className = "size-5" }: IconProps) {
   return (
     <svg {...base(className)}>

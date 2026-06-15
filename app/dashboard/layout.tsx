@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
-import { Logo, LogoMark } from "@/components/brand/logo";
+import { Logo } from "@/components/brand/logo";
 import { CommandPalette } from "@/components/dashboard/command-palette";
 import { CommandTrigger } from "@/components/dashboard/command-trigger";
+import { MobileNav } from "@/components/dashboard/mobile-nav";
+import { MobileSearchButton } from "@/components/dashboard/mobile-search-button";
 import { NavLinks } from "@/components/dashboard/nav-links";
 import { prisma } from "@/lib/prisma";
 
@@ -77,16 +79,19 @@ export default async function DashboardLayout({
 
         {/* Top bar — mobile */}
         <header className="glass sticky top-0 z-20 flex items-center gap-3 border-b border-border px-4 py-3 lg:hidden print:hidden">
-          <LogoMark className="size-8" />
-          <div className="min-w-0 flex-1">
-            <NavLinks />
+          <Logo />
+          <div className="ml-auto">
+            <MobileSearchButton />
           </div>
-          <SignOutButton />
         </header>
 
-        <div className="relative flex flex-1 flex-col">{children}</div>
+        {/* Bottom padding reserves room for the fixed mobile tab bar. */}
+        <div className="relative flex flex-1 flex-col pb-24 lg:pb-0">
+          {children}
+        </div>
       </div>
 
+      <MobileNav />
       <CommandPalette />
     </div>
   );

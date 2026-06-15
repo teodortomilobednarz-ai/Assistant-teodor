@@ -197,6 +197,21 @@ select:focus-visible {
   pointer-events: none;
 }
 
+/* Bottom-sheet entrance (mobile "Plus" menu). */
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-sheet-up {
+  animation: sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Entrance motion. */
 @keyframes fade-up {
   from {
@@ -231,7 +246,8 @@ select:focus-visible {
   .aurora,
   .shimmer,
   .float,
-  .animate-task-out {
+  .animate-task-out,
+  .animate-sheet-up {
     animation: none;
   }
 }

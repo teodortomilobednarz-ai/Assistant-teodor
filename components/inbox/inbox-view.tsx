@@ -158,7 +158,7 @@ export function InboxView() {
                 <li key={message.id}>
                   <Link
                     href={`/dashboard/inbox/${message.id}`}
-                    className={`flex items-start gap-3 rounded-2xl border p-4 transition-all hover:-translate-y-0.5 hover:border-accent/40 ${
+                    className={`flex items-start gap-3 rounded-2xl border p-4 transition-all active:scale-[0.99] hover:-translate-y-0.5 hover:border-accent/40 ${
                       message.unread
                         ? "border-accent/30 bg-accent-soft/60 shadow-sm"
                         : "border-border bg-surface"
