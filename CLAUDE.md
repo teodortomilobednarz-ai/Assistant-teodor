@@ -56,7 +56,8 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   ├── dashboard/                 # Protected area (auth + onboarding guard in layout.tsx)
 │   │   ├── layout.tsx             # Sidebar + ⌘K command palette
 │   │   ├── page.tsx               # Control-center home (stats, quick actions, copilot)
-│   │   ├── inbox/                 # Gmail: search/filters list + email workspace + actions
+│   │   ├── recherche/page.tsx     # Universal AI search (answers from email+agenda+docs)
+│   │   ├── inbox/                 # Gmail: search/filters list + email workspace (draft + send)
 │   │   ├── relances/page.tsx      # Follow-ups (sent emails awaiting reply)
 │   │   ├── agenda/page.tsx        # Calendar: events grouped by day, day summary, create
 │   │   ├── docs/page.tsx          # Drive: recent files, search + summarize Docs

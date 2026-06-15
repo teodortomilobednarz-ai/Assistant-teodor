@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { createDraft } from "@/lib/gmail";
+import { createDraft, sendMessage } from "@/lib/gmail";
 import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
 
 export interface DraftActionState {
@@ -53,6 +53,49 @@ export async function createDraftAction(
     return {
       ok: false,
       message: "Impossible de créer le brouillon. Réessaie dans un instant.",
+    };
+  }
+}
+
+/**
+ * Sends an email reply for the signed-in user. Triggered only by an explicit
+ * "Send" click in the UI (requires the gmail.send scope).
+ */
+export async function sendReplyAction(
+  _prevState: DraftActionState,
+  formData: FormData,
+): Promise<DraftActionState> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return { ok: false, message: "Non authentifié." };
+  }
+
+  const to = parseEmailAddress(String(formData.get("to") ?? ""));
+  const subject = String(formData.get("subject") ?? "");
+  const body = String(formData.get("body") ?? "").trim();
+  const threadId = String(formData.get("threadId") ?? "") || undefined;
+
+  if (!to || !body) {
+    return { ok: false, message: "Destinataire ou contenu manquant." };
+  }
+
+  try {
+    const accessToken = await getValidGoogleAccessToken(userId);
+    await sendMessage(accessToken, { to, subject, body, threadId });
+    return { ok: true, message: "Email envoyé ✅" };
+  } catch (error) {
+    console.error("[sendReplyAction] failed:", error);
+    if (isReconnectError(error)) {
+      return {
+        ok: false,
+        message:
+          "Reconnecte-toi avec Google (déconnexion → reconnexion) pour autoriser l'envoi.",
+      };
+    }
+    return {
+      ok: false,
+      message: "Impossible d'envoyer l'email. Réessaie dans un instant.",
     };
   }
 }

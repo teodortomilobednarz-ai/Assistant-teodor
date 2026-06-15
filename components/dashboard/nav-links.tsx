@@ -13,10 +13,12 @@ import {
   MailIcon,
   ReceiptIcon,
   ReplyIcon,
+  SearchIcon,
 } from "@/components/icons";
 
 const LINKS = [
   { href: "/dashboard", label: "Accueil", icon: HomeIcon, exact: true },
+  { href: "/dashboard/recherche", label: "Recherche", icon: SearchIcon },
   { href: "/dashboard/inbox", label: "Boîte", icon: MailIcon },
   { href: "/dashboard/relances", label: "Relances", icon: ReplyIcon },
   { href: "/dashboard/agenda", label: "Agenda", icon: CalendarIcon },

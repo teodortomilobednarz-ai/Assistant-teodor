@@ -26,9 +26,10 @@ export default function PrivacyPage() {
           <p className="mt-2">
             Lors de la connexion avec Google, Draidly accède à votre nom, votre
             adresse email et votre photo de profil. Avec votre autorisation,
-            Draidly accède également à votre messagerie Gmail (lecture et
-            création de brouillons), à votre Google Agenda (lecture et création
-            d&apos;événements) et à votre Google Drive (lecture seule).
+            Draidly accède également à votre messagerie Gmail (lecture, création
+            de brouillons et envoi de réponses uniquement lorsque vous cliquez
+            explicitement sur « Envoyer »), à votre Google Agenda (lecture et
+            création d&apos;événements) et à votre Google Drive (lecture seule).
           </p>
         </section>
 

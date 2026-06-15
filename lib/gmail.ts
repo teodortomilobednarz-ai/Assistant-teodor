@@ -332,3 +332,30 @@ export async function createDraft(
 
   return { id: result.id };
 }
+
+/**
+ * Sends an email on the user's behalf (requires the gmail.send scope). Only
+ * called in response to an explicit "Send" click in the UI.
+ */
+export async function sendMessage(
+  accessToken: string,
+  message: { to: string; subject: string; body: string; threadId?: string },
+): Promise<{ id: string }> {
+  const mime = [
+    `To: ${message.to}`,
+    `Subject: ${message.subject}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    "",
+    message.body,
+  ].join("\r\n");
+
+  const result = await gmailFetch<{ id: string }>(accessToken, "/messages/send", {
+    method: "POST",
+    body: JSON.stringify({
+      raw: encodeBase64Url(mime),
+      ...(message.threadId ? { threadId: message.threadId } : {}),
+    }),
+  });
+
+  return { id: result.id };
+}

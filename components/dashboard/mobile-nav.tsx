@@ -16,6 +16,7 @@ import {
   MoreIcon,
   ReceiptIcon,
   ReplyIcon,
+  SearchIcon,
 } from "@/components/icons";
 
 type Item = {
@@ -35,6 +36,7 @@ const PRIMARY: Item[] = [
 
 // Secondary destinations — revealed via the "Plus" sheet.
 const MORE: Item[] = [
+  { href: "/dashboard/recherche", label: "Recherche IA", icon: SearchIcon },
   { href: "/dashboard/relances", label: "Relances", icon: ReplyIcon },
   { href: "/dashboard/billing", label: "Devis & factures", icon: ReceiptIcon },
   { href: "/dashboard/tasks", label: "Tâches", icon: ChecksIcon },

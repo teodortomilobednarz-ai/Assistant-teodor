@@ -5,7 +5,11 @@ import { useActionState, useEffect, useState } from "react";
 import { SparklesIcon } from "@/components/icons";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast";
-import { createDraftAction, type DraftActionState } from "@/lib/actions/gmail";
+import {
+  createDraftAction,
+  sendReplyAction,
+  type DraftActionState,
+} from "@/lib/actions/gmail";
 import type { Analysis } from "@/lib/schema";
 
 import { AnalysisResults } from "./analysis-results";
@@ -31,6 +35,10 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
     createDraftAction,
     initialDraftState,
   );
+  const [sendState, runSend, sendPending] = useActionState(
+    sendReplyAction,
+    initialDraftState,
+  );
   const { toast } = useToast();
 
   useEffect(() => {
@@ -38,6 +46,12 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
       toast(draftState.message, draftState.ok ? "success" : "error");
     }
   }, [draftState, toast]);
+
+  useEffect(() => {
+    if (sendState.message) {
+      toast(sendState.message, sendState.ok ? "success" : "error");
+    }
+  }, [sendState, toast]);
 
   const replySubject = email.subject.startsWith("Re:")
     ? email.subject
@@ -127,32 +141,53 @@ export function EmailWorkspace({ email }: EmailWorkspaceProps) {
               className="w-full resize-y rounded-lg border border-border bg-surface-muted p-4 text-sm leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
 
-            <form action={runDraft} className="mt-3 flex flex-wrap items-center gap-3">
-              <input type="hidden" name="to" value={email.from} />
-              <input type="hidden" name="subject" value={replySubject} />
-              <input type="hidden" name="threadId" value={email.threadId} />
-              <input type="hidden" name="body" value={reply} />
-              <button
-                type="submit"
-                disabled={draftPending || !reply.trim()}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover disabled:opacity-50"
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              {/* Send — explicit click + confirmation */}
+              <form
+                action={runSend}
+                onSubmit={(event) => {
+                  if (
+                    !window.confirm(
+                      `Envoyer cette réponse à ${email.from} ?`,
+                    )
+                  ) {
+                    event.preventDefault();
+                  }
+                }}
               >
-                {draftPending && <Spinner className="size-4" />}
-                {draftPending ? "Création…" : "Créer le brouillon dans Gmail"}
-              </button>
-              {draftState.message && (
-                <span
-                  className={`text-sm ${
-                    draftState.ok ? "text-emerald-600" : "text-danger"
-                  }`}
+                <input type="hidden" name="to" value={email.from} />
+                <input type="hidden" name="subject" value={replySubject} />
+                <input type="hidden" name="threadId" value={email.threadId} />
+                <input type="hidden" name="body" value={reply} />
+                <button
+                  type="submit"
+                  disabled={sendPending || draftPending || !reply.trim()}
+                  className="bg-gradient-accent inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 disabled:opacity-50"
                 >
-                  {draftState.message}
-                </span>
-              )}
-            </form>
+                  {sendPending && <Spinner className="size-4" />}
+                  {sendPending ? "Envoi…" : "Envoyer la réponse"}
+                </button>
+              </form>
+
+              {/* Save as draft (never sent) */}
+              <form action={runDraft}>
+                <input type="hidden" name="to" value={email.from} />
+                <input type="hidden" name="subject" value={replySubject} />
+                <input type="hidden" name="threadId" value={email.threadId} />
+                <input type="hidden" name="body" value={reply} />
+                <button
+                  type="submit"
+                  disabled={draftPending || sendPending || !reply.trim()}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 disabled:opacity-50"
+                >
+                  {draftPending && <Spinner className="size-4" />}
+                  {draftPending ? "Création…" : "Enregistrer en brouillon"}
+                </button>
+              </form>
+            </div>
             <p className="mt-2 text-xs text-muted">
-              Le brouillon est créé dans Gmail mais <strong>jamais envoyé</strong>{" "}
-              — vous gardez le contrôle.
+              Rien n&apos;est envoyé sans votre confirmation. « Envoyer » expédie
+              la réponse ; « Brouillon » l&apos;enregistre dans Gmail.
             </p>
           </section>
         </>

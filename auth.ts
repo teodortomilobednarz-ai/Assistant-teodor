@@ -23,7 +23,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         params: {
           // Request offline access so we receive a refresh token, needed to
           // call Google APIs on the user's behalf. `gmail.modify` covers
-          // reading messages and creating drafts (never sending).
+          // reading and drafts; `gmail.send` lets the user send a reply with an
+          // explicit click from within Draidly.
           access_type: "offline",
           prompt: "consent",
           scope: [
@@ -31,6 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             "email",
             "profile",
             "https://www.googleapis.com/auth/gmail.modify",
+            "https://www.googleapis.com/auth/gmail.send",
             "https://www.googleapis.com/auth/calendar.events",
             "https://www.googleapis.com/auth/drive.readonly",
           ].join(" "),
