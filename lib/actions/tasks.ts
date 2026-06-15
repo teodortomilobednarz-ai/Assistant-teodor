@@ -38,3 +38,30 @@ export async function deleteTask(formData: FormData): Promise<void> {
 
   revalidatePath("/dashboard/tasks");
 }
+
+export interface CreatedTask {
+  id: string;
+  title: string;
+  priority: "haute" | "moyenne" | "basse";
+  dueDate: string | null;
+  done: boolean;
+}
+
+export async function createTask(title: string): Promise<CreatedTask | null> {
+  const userId = await requireUserId();
+  const trimmed = title.trim();
+  if (!trimmed) return null;
+
+  const task = await prisma.task.create({
+    data: { userId, title: trimmed, priority: "moyenne" },
+  });
+
+  revalidatePath("/dashboard/tasks");
+  return {
+    id: task.id,
+    title: task.title,
+    priority: task.priority,
+    dueDate: task.dueDate,
+    done: task.done,
+  };
+}

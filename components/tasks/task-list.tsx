@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { PriorityBadge } from "@/components/copilot/priority-badge";
 import { ChecksIcon } from "@/components/icons";
-import { deleteTask, setTaskDone } from "@/lib/actions/tasks";
+import { createTask, deleteTask, setTaskDone } from "@/lib/actions/tasks";
 import type { TaskPriority } from "@/lib/schema";
 
 export interface TaskItem {
@@ -38,6 +38,15 @@ export function TaskList({ active, history }: TaskListProps) {
   const [historyList, setHistoryList] = useState(history);
   const [exiting, setExiting] = useState<Set<string>>(new Set());
   const [showHistory, setShowHistory] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+
+  async function add() {
+    const created = await createTask(newTitle);
+    if (created) {
+      setActiveList((prev) => [created, ...prev]);
+      setNewTitle("");
+    }
+  }
 
   function complete(task: TaskItem) {
     persistDone(task.id, true);
@@ -70,6 +79,28 @@ export function TaskList({ active, history }: TaskListProps) {
 
   return (
     <div className="flex flex-col gap-6">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void add();
+        }}
+        className="flex gap-2"
+      >
+        <input
+          value={newTitle}
+          onChange={(event) => setNewTitle(event.target.value)}
+          placeholder="Ajouter une tâche…"
+          className="w-full rounded-xl border border-border bg-surface p-2.5 text-sm outline-none transition-colors placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20"
+        />
+        <button
+          type="submit"
+          disabled={!newTitle.trim()}
+          className="bg-gradient-accent shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+        >
+          Ajouter
+        </button>
+      </form>
+
       {activeList.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-surface/50 p-10 text-center">
           <span className="bg-gradient-accent flex size-12 items-center justify-center rounded-2xl text-white shadow-sm">
