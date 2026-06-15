@@ -100,8 +100,9 @@ export function DocsWorkspace() {
           <SparklesIcon className="size-4" />
         </span>
         <p className="text-sm leading-relaxed text-foreground">
-          Draidly peut actuellement analyser les <strong>Google Docs</strong>. La
-          lecture des PDF, Sheets et autres fichiers arrive bientôt.
+          Draidly lit vos <strong>Google Docs, Sheets, Slides, PDF, images</strong>{" "}
+          et fichiers texte. Les fichiers Office, vidéos et archives arrivent
+          bientôt.
         </p>
       </div>
 
@@ -162,7 +163,7 @@ export function DocsWorkspace() {
               >
                 <span
                   className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
-                    file.isGoogleDoc
+                    file.summarizable
                       ? "bg-accent-soft text-accent"
                       : "bg-surface-muted text-muted"
                   }`}
@@ -185,7 +186,7 @@ export function DocsWorkspace() {
                   </span>
                 </div>
 
-                {file.isGoogleDoc ? (
+                {file.summarizable ? (
                   <button
                     type="button"
                     onClick={() => handleSummarize(file)}

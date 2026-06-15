@@ -86,6 +86,45 @@ export async function summarize(opts: {
   return text.trim();
 }
 
+const DOC_INSTRUCTION = `Tu es un assistant pour dirigeant de PME. Résume le document fourni en français : commence par 3 à 5 phrases pour l'essentiel, puis liste les points clés en puces. Si le document contient des chiffres, dates ou montants importants, mets-les en avant. Sois clair, concis et fidèle au document.`;
+
+/**
+ * Summarizes a document supplied either as extracted text or as raw bytes
+ * (PDF, image) read natively by the multimodal model.
+ */
+export async function summarizeDocument(
+  part:
+    | { kind: "text"; text: string }
+    | { kind: "inline"; mimeType: string; data: string },
+): Promise<string> {
+  const client = getGeminiClient();
+
+  const contentPart =
+    part.kind === "text"
+      ? { text: part.text.slice(0, 40_000) }
+      : { inlineData: { mimeType: part.mimeType, data: part.data } };
+
+  const response = await client.models.generateContent({
+    model: MODEL,
+    contents: [
+      {
+        role: "user",
+        parts: [contentPart, { text: "Résume ce document." }],
+      },
+    ],
+    config: {
+      systemInstruction: DOC_INSTRUCTION,
+      temperature: 0.4,
+    },
+  });
+
+  const text = response.text;
+  if (!text || !text.trim()) {
+    throw new Error("Réponse vide du modèle.");
+  }
+  return text.trim();
+}
+
 export async function analyzeContent(input: AnalyzeRequest): Promise<Analysis> {
   const client = getGeminiClient();
 

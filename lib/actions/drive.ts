@@ -1,9 +1,9 @@
 "use server";
 
 import { auth } from "@/auth";
-import { summarize } from "@/lib/copilot";
+import { summarizeDocument } from "@/lib/copilot";
 import {
-  getDocumentText,
+  getFileContent,
   listRecentFiles,
   searchFiles,
   type DriveFile,
@@ -74,18 +74,13 @@ export async function summarizeDoc(
 ): Promise<DocSummaryResult> {
   try {
     const accessToken = await requireToken();
-    const text = await getDocumentText(accessToken, fileId, mimeType);
+    const content = await getFileContent(accessToken, fileId, mimeType);
 
-    if (!text.trim()) {
+    if (content.kind === "text" && !content.text.trim()) {
       return { ok: false, error: "Ce document est vide." };
     }
 
-    const summary = await summarize({
-      instruction:
-        "Tu es un assistant pour dirigeant de PME. Résume ce document en français : 3-5 phrases pour l'essentiel, puis les points clés en puces. Sois clair et concis.",
-      content: text.slice(0, 20_000),
-    });
-
+    const summary = await summarizeDocument(content);
     return { ok: true, summary };
   } catch (error) {
     console.error("[summarizeDoc] failed:", error);
@@ -93,7 +88,21 @@ export async function summarizeDoc(
     if (code === "UNSUPPORTED_FILE_TYPE") {
       return {
         ok: false,
-        error: "Pour l'instant, seuls les Google Docs peuvent être résumés.",
+        error:
+          "Ce type de fichier n'est pas encore pris en charge (Office, vidéo, archive).",
+      };
+    }
+    if (code === "FILE_TOO_LARGE") {
+      return {
+        ok: false,
+        error: "Ce fichier est trop volumineux pour être analysé (max ~18 Mo).",
+      };
+    }
+    if (isReconnectError(error)) {
+      return {
+        ok: false,
+        error:
+          "Reconnecte-toi avec Google (déconnexion → reconnexion) pour autoriser Drive.",
       };
     }
     return { ok: false, error: "Résumé impossible pour le moment." };
