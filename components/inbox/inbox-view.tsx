@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SearchIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,7 +68,7 @@ export function InboxView() {
   }, [load]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  async function loadMore() {
+  const loadMore = useCallback(async () => {
     if (!nextPageToken || loadingMore) return;
     setLoadingMore(true);
     const result = await fetchInbox(filter, debounced, nextPageToken);
@@ -77,7 +77,18 @@ export function InboxView() {
       setNextPageToken(result.nextPageToken);
     }
     setLoadingMore(false);
-  }
+  }, [filter, debounced, nextPageToken, loadingMore]);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !nextPageToken) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) void loadMore();
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore, nextPageToken]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -202,14 +213,9 @@ export function InboxView() {
           </ul>
 
           {nextPageToken && (
-            <button
-              type="button"
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="mx-auto mt-2 rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:text-foreground disabled:opacity-60"
-            >
-              {loadingMore ? "Chargement…" : "Charger plus d'emails"}
-            </button>
+            <div ref={sentinelRef} className="py-4 text-center text-xs text-muted">
+              {loadingMore ? "Chargement…" : ""}
+            </div>
           )}
         </>
       )}
