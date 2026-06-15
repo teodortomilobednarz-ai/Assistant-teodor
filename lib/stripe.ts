@@ -13,7 +13,12 @@ let client: Stripe | null = null;
 export function getStripe(): Stripe {
   if (client === null) {
     const { secretKey } = getStripeEnv();
-    client = new Stripe(secretKey, { typescript: true });
+    client = new Stripe(secretKey, {
+      typescript: true,
+      // Be resilient to transient serverless ↔ Stripe network blips.
+      maxNetworkRetries: 3,
+      timeout: 20_000,
+    });
   }
   return client;
 }
