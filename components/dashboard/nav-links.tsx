@@ -7,6 +7,7 @@ import {
   CalendarIcon,
   ChecksIcon,
   FileIcon,
+  GearIcon,
   MailIcon,
   ReceiptIcon,
   ReplyIcon,
@@ -21,6 +22,7 @@ const LINKS = [
   { href: "/dashboard/docs", label: "Documents", icon: FileIcon },
   { href: "/dashboard/billing", label: "Devis", icon: ReceiptIcon },
   { href: "/dashboard/tasks", label: "Tâches", icon: ChecksIcon },
+  { href: "/dashboard/settings", label: "Réglages", icon: GearIcon },
 ];
 
 export function NavLinks({ vertical = false }: { vertical?: boolean }) {
