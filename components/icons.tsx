@@ -102,3 +102,12 @@ export function ReceiptIcon({ className = "size-5" }: IconProps) {
     </svg>
   );
 }
+
+export function ReplyIcon({ className = "size-5" }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <path d="M9 17l-5-5 5-5" />
+      <path d="M4 12h11a5 5 0 0 1 5 5v1" />
+    </svg>
+  );
+}

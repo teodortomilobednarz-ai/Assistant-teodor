@@ -24,6 +24,16 @@ export interface MessagePage {
   nextPageToken?: string;
 }
 
+export interface FollowUpCandidate {
+  threadId: string;
+  messageId: string;
+  to: string;
+  subject: string;
+  date: string;
+  snippet: string;
+  daysWaiting: number;
+}
+
 export interface GmailMessage {
   id: string;
   threadId: string;
@@ -185,6 +195,64 @@ export async function countMessages(
     `/messages?maxResults=1&q=${encodeURIComponent(q)}`,
   );
   return data.resultSizeEstimate ?? 0;
+}
+
+/**
+ * Finds sent emails awaiting a reply: recent threads whose last message was
+ * sent by the user and that have gone quiet for 3+ days — i.e. good follow-up
+ * candidates.
+ */
+export async function findFollowUps(
+  accessToken: string,
+  userEmail: string,
+  maxThreads = 12,
+): Promise<FollowUpCandidate[]> {
+  const list = await gmailFetch<{ messages?: { threadId: string }[] }>(
+    accessToken,
+    `/messages?maxResults=40&q=${encodeURIComponent("in:sent newer_than:45d")}`,
+  );
+
+  const threadIds = Array.from(
+    new Set((list.messages ?? []).map((m) => m.threadId)),
+  ).slice(0, maxThreads);
+
+  const email = userEmail.toLowerCase();
+  const candidates: FollowUpCandidate[] = [];
+
+  await Promise.all(
+    threadIds.map(async (threadId) => {
+      const thread = await gmailFetch<{ messages?: GmailMessageResource[] }>(
+        accessToken,
+        `/threads/${threadId}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`,
+      );
+      const msgs = thread.messages ?? [];
+      if (msgs.length === 0) return;
+
+      const last = msgs[msgs.length - 1];
+      const lastFrom = header(last.payload?.headers, "From").toLowerCase();
+      // Awaiting reply only if the user sent the most recent message.
+      if (!lastFrom.includes(email)) return;
+
+      const dateStr = header(last.payload?.headers, "Date");
+      const date = new Date(dateStr);
+      const daysWaiting = Number.isNaN(date.getTime())
+        ? 0
+        : Math.floor((Date.now() - date.getTime()) / 86_400_000);
+      if (daysWaiting < 3) return;
+
+      candidates.push({
+        threadId,
+        messageId: last.id,
+        to: header(last.payload?.headers, "To"),
+        subject: header(last.payload?.headers, "Subject"),
+        date: dateStr,
+        snippet: last.snippet ?? "",
+        daysWaiting,
+      });
+    }),
+  );
+
+  return candidates.sort((a, b) => b.daysWaiting - a.daysWaiting);
 }
 
 export async function getMessage(

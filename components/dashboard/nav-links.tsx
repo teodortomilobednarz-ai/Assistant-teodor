@@ -9,12 +9,14 @@ import {
   FileIcon,
   MailIcon,
   ReceiptIcon,
+  ReplyIcon,
   SparklesIcon,
 } from "@/components/icons";
 
 const LINKS = [
   { href: "/dashboard", label: "Accueil", icon: SparklesIcon, exact: true },
   { href: "/dashboard/inbox", label: "Boîte", icon: MailIcon },
+  { href: "/dashboard/relances", label: "Relances", icon: ReplyIcon },
   { href: "/dashboard/agenda", label: "Agenda", icon: CalendarIcon },
   { href: "/dashboard/docs", label: "Documents", icon: FileIcon },
   { href: "/dashboard/billing", label: "Devis", icon: ReceiptIcon },
