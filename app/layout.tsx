@@ -15,10 +15,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const DESCRIPTION =
+  "Draidly résume vos emails, prépare vos réponses, crée vos tâches et retrouve vos informations — votre copilote IA pour PME.";
+
 export const metadata: Metadata = {
-  title: "Draidly — l'assistant IA pour PME",
-  description:
-    "Draidly résume vos emails, prépare vos réponses, crée vos tâches et retrouve vos informations.",
+  metadataBase: new URL("https://assistant-teodor.vercel.app"),
+  title: {
+    default: "Draidly — l'assistant IA pour PME",
+    template: "%s · Draidly",
+  },
+  description: DESCRIPTION,
+  openGraph: {
+    title: "Draidly — l'assistant IA pour PME",
+    description: DESCRIPTION,
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Draidly",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Draidly — l'assistant IA pour PME",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
