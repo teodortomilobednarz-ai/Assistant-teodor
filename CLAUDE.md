@@ -2,10 +2,12 @@
 
 This file gives guidance to AI assistants (Claude Code and others) working in this repository.
 
-> **Status: MVP built (Milestones 1–3).** Working Next.js app: Google sign-in (Auth.js),
-> PostgreSQL (Prisma), a protected dashboard, and the AI engine (Google Gemini) wired across all
-> four data sources — text analysis with persisted tasks, **Gmail** (read inbox, draft replies),
-> **Calendar** (day summary, create events), and **Drive** (search + summarize Google Docs).
+> **Status: SaaS (beta).** Working Next.js app on a light, lively theme: Google sign-in (Auth.js),
+> PostgreSQL (Prisma), first-run onboarding, a protected dashboard with a ⌘K command palette, and
+> the AI engine (Google Gemini) across **Gmail** (inbox search/filters/pagination, read-unread,
+> draft replies, **follow-ups**, archive), **Calendar** (day summary, create events, grouped by
+> day), **Drive** (recent files, search + summarize Docs), **quotes & invoices**, persisted
+> **tasks** (animated, with history), and **settings**. Toasts, skeletons, error boundaries.
 > Nothing is sent or created without an explicit user click.
 
 ## Project
@@ -46,24 +48,31 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 .
 ├── app/
 │   ├── page.tsx                   # Public landing page (sign-in)
-│   ├── dashboard/                 # Protected area (auth guard in layout.tsx)
-│   │   ├── page.tsx               # Copilot (text analysis)
-│   │   ├── inbox/                 # Gmail: list + email workspace (draft replies)
-│   │   ├── agenda/page.tsx        # Calendar: events, day summary, create event
-│   │   ├── docs/page.tsx          # Drive: search + summarize Google Docs
-│   │   └── tasks/page.tsx         # Persisted tasks
+│   ├── onboarding/page.tsx        # First-run welcome flow
+│   ├── dashboard/                 # Protected area (auth + onboarding guard in layout.tsx)
+│   │   ├── layout.tsx             # Sidebar + ⌘K command palette
+│   │   ├── page.tsx               # Control-center home (stats, quick actions, copilot)
+│   │   ├── inbox/                 # Gmail: search/filters list + email workspace + actions
+│   │   ├── relances/page.tsx      # Follow-ups (sent emails awaiting reply)
+│   │   ├── agenda/page.tsx        # Calendar: events grouped by day, day summary, create
+│   │   ├── docs/page.tsx          # Drive: recent files, search + summarize Docs
+│   │   ├── billing/              # Quotes & invoices (AI line items, printable PDF)
+│   │   ├── tasks/page.tsx         # Persisted tasks (animated, history)
+│   │   └── settings/page.tsx      # Account, business profile, Google connection
 │   ├── api/analyze/route.ts       # Analyze endpoint (+ persistence)
 │   ├── api/auth/[...nextauth]/    # Auth.js routes
-│   └── layout.tsx · globals.css   # Root layout + design tokens
-├── auth.ts                        # Auth.js (NextAuth v5) configuration
-├── components/                    # UI: copilot/, auth/
+│   ├── error.tsx · not-found.tsx  # Error boundary + 404
+│   └── layout.tsx · globals.css   # Root layout (ToastProvider) + design tokens
+├── auth.ts                        # Auth.js (NextAuth v5) config (persists OAuth tokens on sign-in)
+├── components/                    # UI: copilot/, inbox/, billing/, dashboard/, settings/, etc.
 ├── lib/
 │   ├── gemini.ts · copilot.ts     # AI engine (Gemini) + core logic
-│   ├── google.ts                  # OAuth token refresh for Google APIs
+│   ├── google.ts                  # OAuth token refresh + isReconnectError
 │   ├── gmail.ts · calendar.ts · drive.ts  # Google API clients
+│   ├── billing-utils.ts · billing.ts      # Invoice helpers + AI line items
 │   ├── prisma.ts                  # Prisma client singleton
 │   ├── env.ts · schema.ts         # Validated env + Zod schemas
-│   └── actions/                   # Server actions (auth, tasks, gmail, calendar, drive)
+│   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
 ├── CLAUDE.md · ROLE.md · README.md

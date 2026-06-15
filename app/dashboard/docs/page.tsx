@@ -10,7 +10,7 @@ export default function DocsPage() {
       <PageHeader
         icon={FileIcon}
         title="Documents"
-        description="Recherchez un document dans votre Drive et obtenez-en un résumé."
+        description="Vos documents récents — recherchez-en un et obtenez son résumé en un clic."
       />
       <DocsWorkspace />
     </main>
