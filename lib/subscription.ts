@@ -19,6 +19,7 @@ export async function getSubscriptionStatus(
   userId: string,
 ): Promise<SubscriptionStatus> {
   let user: {
+    email: string | null;
     stripeCustomerId: string | null;
     stripeCurrentPeriodEnd: Date | null;
     stripePriceId: string | null;
@@ -28,6 +29,7 @@ export async function getSubscriptionStatus(
     user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
+        email: true,
         stripeCustomerId: true,
         stripeCurrentPeriodEnd: true,
         stripePriceId: true,
@@ -37,6 +39,21 @@ export async function getSubscriptionStatus(
     // e.g. billing columns not migrated yet — treat as the free plan.
     console.error("[getSubscriptionStatus] failed:", error);
     return { active: false, plan: "free", currentPeriodEnd: null, hasCustomer: false };
+  }
+
+  // Admin override: emails listed in ADMIN_EMAILS get full Pro access (for the
+  // owner to test everything without paying).
+  const admins = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (user?.email && admins.includes(user.email.toLowerCase())) {
+    return {
+      active: true,
+      plan: "pro",
+      currentPeriodEnd: null,
+      hasCustomer: Boolean(user.stripeCustomerId),
+    };
   }
 
   const end = user?.stripeCurrentPeriodEnd ?? null;

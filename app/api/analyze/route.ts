@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { analyzeContent } from "@/lib/copilot";
 import { prisma } from "@/lib/prisma";
 import { analyzeRequestSchema, type Analysis } from "@/lib/schema";
+import { checkAnalysisQuota } from "@/lib/usage";
 
 export const runtime = "nodejs";
 
@@ -65,6 +66,22 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
+    // Enforce the per-plan daily analysis quota (free = 5/day).
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (userId) {
+      const quota = await checkAnalysisQuota(userId);
+      if (!quota.allowed) {
+        return NextResponse.json(
+          {
+            error: `Limite atteinte : ${quota.limit} analyses par jour avec le plan gratuit. Passez à un plan supérieur pour des analyses illimitées.`,
+            upgrade: true,
+          },
+          { status: 402 },
+        );
+      }
+    }
+
     // Owner UI language (for summary/keypoints) from the browser; the draft
     // reply itself is always written in the analyzed message's language.
     const acceptLanguage = request.headers.get("accept-language") ?? "";
@@ -73,9 +90,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const analysis = await analyzeContent(parsed.data, ownerLanguage);
 
-    const session = await auth();
-    if (session?.user?.id) {
-      await persistAnalysis(session.user.id, parsed.data, analysis);
+    if (userId) {
+      await persistAnalysis(userId, parsed.data, analysis);
     }
 
     return NextResponse.json(analysis);

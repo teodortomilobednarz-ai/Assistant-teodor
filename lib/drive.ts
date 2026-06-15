@@ -35,6 +35,20 @@ function isPlainText(mimeType: string): boolean {
 }
 
 /**
+ * "Advanced" file types reserved for the Pro plan: Office documents, audio,
+ * video and archives. (Google-native docs, PDF, images and text stay available
+ * on every plan.)
+ */
+export function isAdvancedDoc(mimeType: string): boolean {
+  return (
+    OFFICE_MIMES.has(mimeType) ||
+    ARCHIVE_MIMES.has(mimeType) ||
+    mimeType.startsWith("audio/") ||
+    mimeType.startsWith("video/")
+  );
+}
+
+/**
  * Whether Draidly can read/summarize this file. Covers Google Docs/Sheets/
  * Slides, Office (Word/Excel/PowerPoint/OpenDocument), PDFs, images, audio,
  * video, plain text and archives — i.e. essentially everything common.

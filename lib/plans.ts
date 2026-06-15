@@ -37,8 +37,8 @@ export const FREE_PLAN: Plan = {
   features: [
     "Connexion Gmail, Agenda et Drive",
     "5 analyses IA par jour",
-    "Résumés d'emails",
-    "Tâches manuelles",
+    "Documents standards (Docs, PDF, images)",
+    "Tâches et recherche IA",
   ],
 };
 
@@ -51,8 +51,8 @@ export const ESSENTIEL_PLAN: Plan = {
   priceYearly: 49.9, // ~2 mois offerts
   features: [
     "Analyses IA illimitées",
-    "Résumés d'emails et de Google Docs",
-    "Brouillons de réponses",
+    "Documents standards (Docs, PDF, Sheets, images)",
+    "Brouillons et envoi d'emails",
     "Tâches et relances",
     "Jusqu'à 10 devis / factures par mois",
   ],
@@ -68,9 +68,9 @@ export const PRO_PLAN: Plan = {
   highlight: true,
   features: [
     "Tout le plan Essentiel",
-    "Lecture de tous les documents (PDF, Sheets, Slides, images)",
+    "Lecture de TOUS les fichiers (Office, audio, vidéo, archives)",
     "Devis & factures illimités",
-    "Relances automatiques",
+    "Recherche IA avancée",
     "Résumé quotidien de l'agenda",
     "Support prioritaire",
   ],

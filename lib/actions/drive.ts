@@ -4,11 +4,13 @@ import { auth } from "@/auth";
 import { summarizeDocument } from "@/lib/copilot";
 import {
   getFileContent,
+  isAdvancedDoc,
   listRecentFiles,
   searchFiles,
   type DriveFile,
 } from "@/lib/drive";
 import { getValidGoogleAccessToken, isReconnectError } from "@/lib/google";
+import { canReadAdvancedDocs } from "@/lib/usage";
 
 async function requireToken(): Promise<string> {
   const session = await auth();
@@ -73,6 +75,19 @@ export async function summarizeDoc(
   mimeType: string,
 ): Promise<DocSummaryResult> {
   try {
+    // Heavy file types (Office, audio, video, archives) are Pro-only.
+    if (isAdvancedDoc(mimeType)) {
+      const session = await auth();
+      const userId = session?.user?.id;
+      if (!userId || !(await canReadAdvancedDocs(userId))) {
+        return {
+          ok: false,
+          error:
+            "La lecture des fichiers Office, audio, vidéo et archives est réservée au plan Pro.",
+        };
+      }
+    }
+
     const accessToken = await requireToken();
     const content = await getFileContent(accessToken, fileId, mimeType);
 

@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import { computeTotals } from "@/lib/billing-utils";
 import { generateInvoiceItems } from "@/lib/billing";
 import { prisma } from "@/lib/prisma";
+import { checkInvoiceQuota } from "@/lib/usage";
 
 export interface GenerateInvoiceState {
   ok: boolean;
@@ -40,6 +41,17 @@ export async function generateInvoice(
     return {
       ok: false,
       message: "Renseigne ton entreprise, le client et la demande.",
+    };
+  }
+
+  const quota = await checkInvoiceQuota(userId);
+  if (!quota.allowed) {
+    return {
+      ok: false,
+      message:
+        quota.limit === 0
+          ? "Les devis & factures nécessitent un abonnement (Essentiel ou Pro)."
+          : `Limite atteinte : ${quota.limit} devis/factures par mois sur votre plan. Passez au plan Pro pour un usage illimité.`,
     };
   }
 

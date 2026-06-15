@@ -121,12 +121,9 @@ export function DocsWorkspace() {
           <SparklesIcon className="size-4" />
         </span>
         <p className="text-sm leading-relaxed text-foreground">
-          Draidly lit{" "}
-          <strong>
-            tous vos fichiers : Google Docs, Word, Excel, PowerPoint, PDF,
-            images, audio, vidéos et archives
-          </strong>{" "}
-          — et en fait un résumé clair.
+          Draidly résume vos <strong>documents, PDF et images</strong>. La
+          lecture des fichiers <strong>Office, audio, vidéo et archives</strong>{" "}
+          est incluse dans le <strong>plan Pro</strong>.
         </p>
       </div>
 
