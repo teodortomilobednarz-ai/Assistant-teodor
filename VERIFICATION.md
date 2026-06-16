@@ -49,7 +49,7 @@ erreur 403 en visitant ta page d'accueil et **refuse la vérification**.
 Google Cloud Console → **OAuth consent screen** :
 - User type : **External**
 - App name : **Draidly**, logo : le logo Draidly
-- Adresse e-mail d'assistance : une adresse que tu relèves
+- Adresse e-mail d'assistance : `info@draidly.com` (que tu relèves)
 - **App domain** → Application home page : `https://draidly.com`
   (idéalement ton vrai domaine `draidly.com` une fois branché)
 - **Privacy policy** : `https://draidly.com/privacy`

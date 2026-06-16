@@ -304,6 +304,9 @@ export default async function LandingPage() {
             <Link href="/mentions-legales" className="hover:text-foreground">
               Mentions légales
             </Link>
+            <a href="mailto:info@draidly.com" className="hover:text-foreground">
+              Contact
+            </a>
             <span>Propulsé par Google Gemini</span>
           </div>
         </div>

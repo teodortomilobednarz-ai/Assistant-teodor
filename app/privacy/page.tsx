@@ -6,7 +6,7 @@ export const metadata = {
   title: "Confidentialité — Draidly",
 };
 
-const CONTACT = "contact@draidly.com";
+const CONTACT = "info@draidly.com";
 
 export default function PrivacyPage() {
   return (
@@ -142,7 +142,14 @@ export default function PrivacyPage() {
           <h2 className="text-base font-semibold text-foreground">Contact</h2>
           <p className="mt-2">
             Pour toute question relative à vos données ou à cette politique,
-            contactez-nous à <strong>{CONTACT}</strong>.
+            contactez-nous à{" "}
+            <a
+              href={`mailto:${CONTACT}`}
+              className="text-accent hover:underline"
+            >
+              {CONTACT}
+            </a>
+            .
           </p>
         </section>
       </div>

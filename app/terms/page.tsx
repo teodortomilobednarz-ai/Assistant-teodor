@@ -56,6 +56,20 @@ export default function TermsPage() {
             tout moment depuis votre compte Google.
           </p>
         </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-foreground">Contact</h2>
+          <p className="mt-2">
+            Pour toute question, écrivez-nous à{" "}
+            <a
+              href="mailto:info@draidly.com"
+              className="text-accent hover:underline"
+            >
+              info@draidly.com
+            </a>
+            .
+          </p>
+        </section>
       </div>
 
       <p className="mt-10 text-xs text-muted">
