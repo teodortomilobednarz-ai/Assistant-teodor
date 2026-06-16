@@ -7,6 +7,11 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-skills.sh\" 2>/dev/null || true",
             "statusMessage": "Installing UI/UX Pro Max skills globally..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/register-mcp.sh\" 2>/dev/null || true",
+            "statusMessage": "Registering n8n MCP server..."
           }
         ]
       }
