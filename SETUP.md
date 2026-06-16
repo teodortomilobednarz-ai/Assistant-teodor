@@ -23,13 +23,14 @@ Tout est **gratuit**. Compte ~20 minutes. Fais les étapes dans l'ordre.
 
 ## 3. Secret de session — `AUTH_SECRET`
 
-Tu peux utiliser celui-ci (déjà généré pour toi) :
+Génère un secret **aléatoire** (ne le partage jamais, ne le commite jamais) :
 
-```
-AUTH_SECRET=jZroN5S1daHBcYZex4EINEp9m5ufqw6/rCKAbHE49XIO
+```bash
+openssl rand -base64 33
 ```
 
-*(Ou génère le tien avec `openssl rand -base64 33`.)*
+Copie le résultat → c'est ton **`AUTH_SECRET`**. *(Sur Windows sans `openssl`,
+utilise un générateur de mot de passe long, ou <https://generate-secret.vercel.app/32>.)*
 
 ## 4. Connexion Google + Gmail — Google Cloud (gratuit)
 
