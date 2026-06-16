@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE = "https://assistant-teodor.vercel.app";
+const BASE = "https://draidly.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = ["", "/tarifs", "/privacy", "/terms", "/mentions-legales"];

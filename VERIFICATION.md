@@ -50,11 +50,11 @@ Google Cloud Console → **OAuth consent screen** :
 - User type : **External**
 - App name : **Draidly**, logo : le logo Draidly
 - Adresse e-mail d'assistance : une adresse que tu relèves
-- **App domain** → Application home page : `https://assistant-teodor.vercel.app`
-  (idéalement ton vrai domaine `draidly.app` une fois branché)
-- **Privacy policy** : `https://assistant-teodor.vercel.app/privacy`
-- **Terms of service** : `https://assistant-teodor.vercel.app/terms`
-- **Authorized domains** : `vercel.app` (ou `draidly.app`)
+- **App domain** → Application home page : `https://draidly.com`
+  (idéalement ton vrai domaine `draidly.com` une fois branché)
+- **Privacy policy** : `https://draidly.com/privacy`
+- **Terms of service** : `https://draidly.com/terms`
+- **Authorized domains** : `vercel.app` (ou `draidly.com`)
 - Developer contact : ton email
 
 ### 4. Scopes
@@ -92,7 +92,7 @@ demandes de précisions — il faut itérer).
   qu'il choisit d'analyser pour en produire un résumé. Lecture seule. »
 
 ## 💡 Conseils
-- Utilise ton **vrai domaine** `draidly.app` si possible : ça rassure Google et
+- Utilise ton **vrai domaine** `draidly.com` si possible : ça rassure Google et
   c'est plus pro (page d'accueil + confidentialité sur le même domaine que le
   client OAuth).
 - Garde la liste de scopes **minimale** : chaque scope restreint en plus = revue

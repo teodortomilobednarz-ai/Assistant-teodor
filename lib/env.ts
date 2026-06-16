@@ -47,7 +47,7 @@ export function getStripeEnv(): StripeEnv {
   if (!proMonthly) throw new Error("STRIPE_PRICE_PRO_MONTHLY is not set.");
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://assistant-teodor.vercel.app";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://draidly.com";
 
   return {
     secretKey,

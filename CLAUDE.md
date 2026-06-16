@@ -16,7 +16,7 @@ This file gives guidance to AI assistants (Claude Code and others) working in th
 
 ## Project
 
-- **Name:** Assistant-teodor (repository) — **product brand: Draidly** (target domain `draidly.app`).
+- **Name:** Assistant-teodor (repository) — **product brand: Draidly** (target domain `draidly.com`).
 - **Repository:** `teodortomilobednarz-ai/assistant-teodor`
 - **Purpose:** Personal-assistant project for Teodor. The assistant's role, scope, and working
   rules are defined in [`ROLE.md`](ROLE.md) — read it before acting.

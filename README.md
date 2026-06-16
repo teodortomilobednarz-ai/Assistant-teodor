@@ -3,7 +3,7 @@
 **Draidly** — l'assistant IA qui aide les dirigeants de PME et les indépendants :
 il **résume** les emails, **prépare les réponses**, **crée les tâches** et
 **retrouve les informations**. Moteur : **Google Gemini** (palier gratuit).
-Domaine cible : `draidly.app`.
+Domaine cible : `draidly.com`.
 
 > **Statut : SaaS (bêta).** Application complète multi-utilisateurs : connexion
 > Google, onboarding, tableau de bord avec palette ⌘K, **Gmail** (boîte,

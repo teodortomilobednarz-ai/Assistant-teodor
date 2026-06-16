@@ -30,7 +30,7 @@ export default function MentionsLegalesPage() {
             <br />
             Adresse : <strong>[à compléter]</strong>
             <br />
-            Contact : <strong>contact@draidly.app</strong>
+            Contact : <strong>contact@draidly.com</strong>
           </p>
         </section>
 
@@ -69,7 +69,7 @@ export default function MentionsLegalesPage() {
             </Link>
             . Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès,
             de rectification et de suppression de vos données, exerçable depuis
-            les réglages de votre compte ou à contact@draidly.app.
+            les réglages de votre compte ou à contact@draidly.com.
           </p>
         </section>
       </div>

@@ -53,7 +53,7 @@ Limite technique honnête : l'assistant **ne peut pas se connecter aux comptes t
 ## Orientation du projet
 
 **Construire une SaaS : « Draidly »**, l'assistant IA pour dirigeants de PME et indépendants
-(domaine cible `draidly.app`). Le produit se connecte aux **emails**, à l'**agenda** et aux
+(domaine cible `draidly.com`). Le produit se connecte aux **emails**, à l'**agenda** et aux
 **documents** du client, puis l'IA :
 
 - **résume** (boîte mail, réunions, documents),

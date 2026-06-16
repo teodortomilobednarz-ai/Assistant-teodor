@@ -19,7 +19,7 @@ const DESCRIPTION =
   "Draidly résume vos emails, prépare vos réponses, crée vos tâches et retrouve vos informations — votre copilote IA pour PME.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://assistant-teodor.vercel.app"),
+  metadataBase: new URL("https://draidly.com"),
   title: {
     default: "Draidly — l'assistant IA pour PME",
     template: "%s · Draidly",

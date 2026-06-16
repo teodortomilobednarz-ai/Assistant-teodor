@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/dashboard/", "/api/", "/onboarding"],
     },
-    sitemap: "https://assistant-teodor.vercel.app/sitemap.xml",
+    sitemap: "https://draidly.com/sitemap.xml",
   };
 }
