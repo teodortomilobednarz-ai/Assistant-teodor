@@ -3,24 +3,59 @@
 import { useState } from "react";
 
 import { Logo } from "@/components/brand/logo";
-import {
-  CalendarIcon,
-  ChecksIcon,
-  FileIcon,
-  MailIcon,
-  ReceiptIcon,
-  ReplyIcon,
-} from "@/components/icons";
 import { completeOnboarding } from "@/lib/actions/onboarding";
 
-const FEATURES = [
-  { icon: MailIcon, title: "Boîte", desc: "Résume et répond à vos emails" },
-  { icon: ReplyIcon, title: "Relances", desc: "Relance les emails sans réponse" },
-  { icon: CalendarIcon, title: "Agenda", desc: "Résume votre journée" },
-  { icon: FileIcon, title: "Documents", desc: "Résume vos docs (dès Essentiel)" },
-  { icon: ReceiptIcon, title: "Devis", desc: "Devis & factures (dès Essentiel)" },
-  { icon: ChecksIcon, title: "Tâches", desc: "Extrait et suit vos actions" },
-];
+const QUESTIONS = [
+  {
+    key: "role",
+    label: "Tu es…",
+    options: [
+      "Indépendant / Freelance",
+      "Auto-entrepreneur",
+      "TPE / PME (avec salariés)",
+      "Autre",
+    ],
+  },
+  {
+    key: "painPoint",
+    label: "Ton plus gros casse-tête au quotidien ?",
+    options: [
+      "Gérer mes emails",
+      "Faire mes devis & factures",
+      "Organiser mon agenda",
+      "Retrouver mes infos",
+      "Un peu tout 😅",
+    ],
+  },
+  {
+    key: "motivation",
+    label: "Pourquoi essayer Draidly ?",
+    options: [
+      "Gagner du temps",
+      "Automatiser l'administratif",
+      "Être plus organisé",
+      "Tester l'IA",
+      "Autre",
+    ],
+  },
+  {
+    key: "source",
+    label: "Où as-tu entendu parler de nous ?",
+    options: [
+      "TikTok",
+      "Instagram",
+      "LinkedIn",
+      "Recherche Google",
+      "Bouche-à-oreille",
+      "Autre",
+    ],
+  },
+  {
+    key: "emailVolume",
+    label: "Combien d'emails reçois-tu par jour ?",
+    options: ["Moins de 10", "10–30", "30–50", "Plus de 50"],
+  },
+] as const;
 
 const inputClass =
   "w-full rounded-lg border border-border bg-surface p-2.5 text-sm outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20";
@@ -37,11 +72,15 @@ export function OnboardingFlow({ firstName, profile }: OnboardingFlowProps) {
   const [companyName, setCompanyName] = useState(profile?.companyName ?? "");
   const [address, setAddress] = useState(profile?.address ?? "");
   const [siret, setSiret] = useState(profile?.siret ?? "");
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+
+  const setAnswer = (key: string, value: string) =>
+    setAnswers((prev) => ({ ...prev, [key]: prev[key] === value ? "" : value }));
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-10">
+    <main className="relative flex min-h-dvh flex-col items-center overflow-y-auto px-6 py-10">
       <div className="aurora" />
-      <div className="relative w-full max-w-lg">
+      <div className="relative my-auto w-full max-w-lg">
         <div className="mb-6 flex flex-col items-center gap-4">
           <Logo />
           <div className="flex gap-1.5">
@@ -68,7 +107,7 @@ export function OnboardingFlow({ firstName, profile }: OnboardingFlowProps) {
               <p className="text-muted">
                 Draidly est votre copilote IA : il connecte vos emails, votre
                 agenda et vos documents pour résumer, répondre, organiser et
-                retrouver — pendant que vous gérez l&apos;essentiel.
+                retrouver. Deux minutes pour personnaliser votre espace.
               </p>
               <button
                 type="button"
@@ -81,6 +120,63 @@ export function OnboardingFlow({ firstName, profile }: OnboardingFlowProps) {
           )}
 
           {step === 1 && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <h2 className="text-xl font-semibold tracking-tight">
+                  Faisons connaissance
+                </h2>
+                <p className="mt-1 text-sm text-muted">
+                  5 questions rapides pour adapter Draidly à votre activité.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-5">
+                {QUESTIONS.map((q) => (
+                  <div key={q.key}>
+                    <p className="mb-2 text-sm font-medium">{q.label}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {q.options.map((opt) => {
+                        const active = answers[q.key] === opt;
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setAnswer(q.key, opt)}
+                            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors active:scale-95 ${
+                              active
+                                ? "border-accent bg-accent text-accent-foreground"
+                                : "border-border bg-surface text-muted hover:text-foreground"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-1 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setStep(0)}
+                  className="text-sm font-medium text-muted hover:text-foreground"
+                >
+                  Précédent
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="bg-gradient-accent rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm"
+                >
+                  Suivant
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
             <div className="flex flex-col gap-4">
               <div>
                 <h2 className="text-xl font-semibold tracking-tight">
@@ -112,52 +208,6 @@ export function OnboardingFlow({ firstName, profile }: OnboardingFlowProps) {
               <div className="mt-1 flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
-                  className="text-sm font-medium text-muted hover:text-foreground"
-                >
-                  Plus tard
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="bg-gradient-accent rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm"
-                >
-                  Suivant
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="flex flex-col gap-4">
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight">
-                  Ce que Draidly fait pour vous
-                </h2>
-                <p className="mt-1 text-sm text-muted">
-                  Tout est relié à l&apos;IA. Rien n&apos;est envoyé sans votre
-                  validation.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {FEATURES.map(({ icon: Icon, title, desc }) => (
-                  <div
-                    key={title}
-                    className="flex items-start gap-3 rounded-xl border border-border bg-surface-muted p-3"
-                  >
-                    <span className="bg-gradient-accent flex size-8 shrink-0 items-center justify-center rounded-lg text-white">
-                      <Icon className="size-4" />
-                    </span>
-                    <div>
-                      <p className="text-sm font-medium">{title}</p>
-                      <p className="text-xs text-muted">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-1 flex items-center justify-between">
-                <button
-                  type="button"
                   onClick={() => setStep(1)}
                   className="text-sm font-medium text-muted hover:text-foreground"
                 >
@@ -180,11 +230,20 @@ export function OnboardingFlow({ firstName, profile }: OnboardingFlowProps) {
                 Tout est prêt 🎉
               </h2>
               <p className="text-muted">
-                Votre espace est configuré. Accédez à votre centre de contrôle.
+                Merci ! Votre espace est configuré. Accédez à votre centre de
+                contrôle.
               </p>
               <input type="hidden" name="companyName" value={companyName} />
               <input type="hidden" name="address" value={address} />
               <input type="hidden" name="siret" value={siret} />
+              {QUESTIONS.map((q) => (
+                <input
+                  key={q.key}
+                  type="hidden"
+                  name={q.key}
+                  value={answers[q.key] ?? ""}
+                />
+              ))}
               <button
                 type="submit"
                 className="bg-gradient-accent glow-hover mx-auto rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm"

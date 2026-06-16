@@ -35,6 +35,7 @@ model User {
 
   businessProfile BusinessProfile?
   invoices        Invoice[]
+  onboardingSurvey OnboardingSurvey?
 
   createdAt DateTime @default(now())
 }
@@ -131,6 +132,26 @@ model Task {
 enum InvoiceType {
   devis
   facture
+}
+
+/// Answers collected during first-run onboarding (audience insight + attribution).
+model OnboardingSurvey {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  /// Who they are (freelance, auto-entrepreneur, TPE/PME…).
+  role        String?
+  /// Their biggest daily pain point.
+  painPoint   String?
+  /// Why they chose to try Draidly.
+  motivation  String?
+  /// Where they heard about Draidly (marketing attribution).
+  source      String?
+  /// Rough daily email volume.
+  emailVolume String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 /// The user's company details, used to fill quotes/invoices.

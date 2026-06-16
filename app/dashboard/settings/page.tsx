@@ -1,11 +1,14 @@
 import Image from "next/image";
 
+import Link from "next/link";
+
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { GearIcon, MailIcon } from "@/components/icons";
 import { DeleteAccount } from "@/components/settings/delete-account";
 import { ProfileForm } from "@/components/settings/profile-form";
+import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -102,6 +105,17 @@ export default async function SettingsPage() {
           </div>
         </div>
       </Card>
+
+      {isAdminEmail(email) && (
+        <Card title="Admin">
+          <Link
+            href="/dashboard/admin"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+          >
+            Voir les réponses d&apos;onboarding →
+          </Link>
+        </Card>
+      )}
 
       <Card title="Confidentialité & données">
         <DeleteAccount />
