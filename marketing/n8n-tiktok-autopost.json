@@ -1,0 +1,103 @@
+{
+  "name": "Draidly — Auto-post TikTok (9h/12h/15h/18h/21h)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 9,12,15,18,21 * * *" }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "9h · 12h · 15h · 18h · 21h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 320]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "operation": "search",
+        "queryString": "mimeType contains 'video/' and trashed = false",
+        "filter": { "folderId": { "value": "REMPLACER_PAR_ID_DOSSIER_FILE_TIKTOK" } },
+        "options": { "orderBy": "createdTime", "limit": 1 }
+      },
+      "id": "getNext",
+      "name": "Prochaine vidéo (Google Drive)",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [520, 320],
+      "notes": "Dossier 'TikTok-Queue' où tu déposes les vidéos. Prend la plus ancienne."
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": { "value": "={{ $json.id }}" }
+      },
+      "id": "download",
+      "name": "Télécharger la vidéo",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [800, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.metricool.com/api/v2/scheduler/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-Mc-Auth", "value": "REMPLACER_PAR_TON_TOKEN_METRICOOL" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "blogId", "value": "REMPLACER_PAR_TON_BLOG_ID" },
+            { "name": "providers", "value": "tiktok" },
+            { "name": "text", "value": "Draidly — ton assistant IA pour PME. Essaie gratuit sur draidly.com #entrepreneur #productivite #ia" },
+            { "name": "publicationDate", "value": "={{ $now.toISO() }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "post",
+      "name": "Publier sur TikTok (Metricool)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1080, 320],
+      "notes": "PLACEHOLDER : adapte l'URL/headers/champs à l'API Metricool (ou à l'API TikTok). Voir AUTOMATION.md."
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": { "value": "={{ $('Prochaine vidéo (Google Drive)').item.json.id }}" },
+        "driveId": { "mode": "list", "value": "My Drive" },
+        "folderId": { "value": "REMPLACER_PAR_ID_DOSSIER_POSTED" }
+      },
+      "id": "archive",
+      "name": "Archiver (déjà posté)",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1360, 320],
+      "notes": "Déplace la vidéo vers 'TikTok-Posted' pour ne pas la reposter."
+    }
+  ],
+  "connections": {
+    "9h · 12h · 15h · 18h · 21h": {
+      "main": [[{ "node": "Prochaine vidéo (Google Drive)", "type": "main", "index": 0 }]]
+    },
+    "Prochaine vidéo (Google Drive)": {
+      "main": [[{ "node": "Télécharger la vidéo", "type": "main", "index": 0 }]]
+    },
+    "Télécharger la vidéo": {
+      "main": [[{ "node": "Publier sur TikTok (Metricool)", "type": "main", "index": 0 }]]
+    },
+    "Publier sur TikTok (Metricool)": {
+      "main": [[{ "node": "Archiver (déjà posté)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "timezone": "Europe/Paris" }
+}
