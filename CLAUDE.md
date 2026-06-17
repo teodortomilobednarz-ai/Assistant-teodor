@@ -87,7 +87,9 @@ See [`ROLE.md`](ROLE.md) for the full role definition.
 │   └── actions/                   # Server actions (auth, tasks, gmail, inbox, calendar, drive, billing, followups, profile, onboarding, subscription, brief)
 ├── prisma/schema.prisma           # Database models
 ├── types/next-auth.d.ts           # Session type augmentation
-├── CLAUDE.md · ROLE.md · README.md · VERIFICATION.md  # (+ Google OAuth submission guide)
+├── vercel.json                    # Vercel config (region cdg1 / Paris — EU data residency)
+├── CLAUDE.md · ROLE.md · README.md             # Guides assistant / rôle / overview
+├── SETUP.md · LAUNCH.md · VERIFICATION.md      # Setup · go-live runbook · Google OAuth verification
 ```
 
 Keep this map accurate as the structure evolves — it is the first thing an assistant reads to
