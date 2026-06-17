@@ -88,8 +88,13 @@ export default function MentionsLegalesPage() {
       </div>
 
       <p className="mt-10 text-xs text-muted">
-        Modèle à finaliser avec vos informations d&apos;immatriculation avant la
-        mise en production publique.
+        <Link href="/privacy" className="hover:text-foreground">
+          Confidentialité
+        </Link>{" "}
+        ·{" "}
+        <Link href="/terms" className="hover:text-foreground">
+          Conditions
+        </Link>
       </p>
     </main>
   );

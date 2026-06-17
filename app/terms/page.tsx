@@ -16,7 +16,7 @@ export default function TermsPage() {
       <h1 className="mt-8 text-3xl font-semibold tracking-tight">
         Conditions d&apos;utilisation
       </h1>
-      <p className="mt-2 text-sm text-muted">Dernière mise à jour : 2026-06-15</p>
+      <p className="mt-2 text-sm text-muted">Dernière mise à jour : 2026-06-17</p>
 
       <div className="mt-8 flex flex-col gap-6 text-sm leading-relaxed text-muted">
         <section>
@@ -73,8 +73,13 @@ export default function TermsPage() {
       </div>
 
       <p className="mt-10 text-xs text-muted">
-        Ce document est un modèle de départ et doit être revu avant une mise en
-        production publique.
+        <Link href="/privacy" className="hover:text-foreground">
+          Confidentialité
+        </Link>{" "}
+        ·{" "}
+        <Link href="/mentions-legales" className="hover:text-foreground">
+          Mentions légales
+        </Link>
       </p>
     </main>
   );
