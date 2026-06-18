@@ -12,6 +12,8 @@ import {
 } from '@expo-google-fonts/jetbrains-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { Colors } from '../constants/theme';
+import { UserProvider } from '../store/UserContext';
+import { PremiumProvider } from '../store/PremiumContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,21 +36,33 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: Colors.background },
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen
-          name="scan-result"
-          options={{ animation: 'slide_from_bottom' }}
-        />
-      </Stack>
-    </>
+    <UserProvider>
+      <PremiumProvider>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: Colors.background },
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen
+            name="scan-result"
+            options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
+            name="body-fat"
+            options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
+            name="subscription"
+            options={{ animation: 'slide_from_bottom' }}
+          />
+        </Stack>
+      </PremiumProvider>
+    </UserProvider>
   );
 }
