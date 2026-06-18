@@ -9,11 +9,12 @@ import { useUser } from '../../store/UserContext';
 import { usePremium } from '../../store/PremiumContext';
 import { AI_PERSONALITIES } from '../../constants/aiPersonalities';
 import { ACTIVITY_LABELS } from '../../services/bmr';
+import { AdBanner } from '../../components/AdBanner';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile, goals, clearProfile } = useUser();
-  const { isPremium, subscribe } = usePremium();
+  const { isPremium } = usePremium();
 
   const personality = profile ? AI_PERSONALITIES[profile.aiStyle] : null;
 
@@ -51,7 +52,7 @@ export default function ProfileScreen() {
               <Ionicons name="flash" size={24} color={Colors.neonPurple} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.premiumTitle}>PASSER À PREMIUM</Text>
-                <Text style={styles.premiumSub}>9,99€/mois · Analyse masse grasse IA</Text>
+                <Text style={styles.premiumSub}>9,99€/mois ou 79,99€/an · Analyse IA illimitée</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={Colors.neonPurple} />
             </View>
@@ -119,6 +120,14 @@ export default function ProfileScreen() {
           <SectionHeader label="ACTIONS" color={Colors.textMuted} />
           <Pressable
             style={styles.actionRow}
+            onPress={() => router.push('/edit-profile')}
+          >
+            <Ionicons name="create-outline" size={18} color={Colors.neonBlue} />
+            <Text style={[styles.actionText, { color: Colors.neonBlue }]}>Modifier le profil</Text>
+            <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} style={{ marginLeft: 'auto' }} />
+          </Pressable>
+          <Pressable
+            style={styles.actionRow}
             onPress={handleResetOnboarding}
           >
             <Ionicons name="refresh" size={18} color={Colors.neonPink} />
@@ -126,6 +135,7 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
 
+        <AdBanner />
         <View style={{ height: 24 }} />
       </ScrollView>
     </SafeAreaView>

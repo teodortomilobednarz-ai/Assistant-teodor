@@ -3,52 +3,41 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, BorderRadius, FontSize } from '../../constants/theme';
+import { useDailyLog, FoodEntry } from '../../store/DailyLogContext';
+import { AdBanner } from '../../components/AdBanner';
 
-const MEALS = [
-  {
-    time: 'MATIN', entries: [
-      { name: 'Omelette aux champignons', kcal: 320, p: 24, c: 6, f: 22, icon: '🍳' },
-      { name: 'Café noir', kcal: 5, p: 0, c: 1, f: 0, icon: '☕' },
-    ],
-  },
-  {
-    time: 'COLLATION', entries: [
-      { name: 'Smoothie protéiné', kcal: 280, p: 30, c: 28, f: 5, icon: '🥤' },
-    ],
-  },
-  {
-    time: 'DÉJEUNER', entries: [
-      { name: 'Salade César', kcal: 420, p: 22, c: 18, f: 28, icon: '🥗' },
-      { name: 'Pain complet', kcal: 120, p: 4, c: 22, f: 2, icon: '🍞' },
-    ],
-  },
-  {
-    time: 'APRÈS-MIDI', entries: [
-      { name: 'Barre protéinée', kcal: 195, p: 20, c: 22, f: 6, icon: '🍫' },
-    ],
-  },
-];
+const MEAL_LABELS: Record<FoodEntry['mealTime'], string> = {
+  breakfast: 'MATIN',
+  lunch: 'DÉJEUNER',
+  dinner: 'DÎNER',
+  snack: 'COLLATION',
+};
 
-const TOTALS = { kcal: 1340, p: 100, c: 97, f: 63 };
+const MEAL_ORDER: FoodEntry['mealTime'][] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 export default function JournalScreen() {
+  const { entries, totals, removeEntry } = useDailyLog();
+
+  const groups = MEAL_ORDER.map((mealTime) => ({
+    mealTime,
+    label: MEAL_LABELS[mealTime],
+    entries: entries.filter((e) => e.mealTime === mealTime),
+  })).filter((g) => g.entries.length > 0);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>JOURNAL</Text>
-        <Pressable style={styles.addBtn} accessibilityLabel="Ajouter un aliment">
-          <Ionicons name="add" size={22} color={Colors.background} />
-        </Pressable>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Daily total */}
+        {/* Daily totals */}
         <View style={styles.totalCard}>
           {[
-            { label: 'CALORIES', value: TOTALS.kcal, unit: 'kcal', color: Colors.neonPurple },
-            { label: 'PROTÉINES', value: TOTALS.p, unit: 'g', color: Colors.electricGreen },
-            { label: 'GLUCIDES', value: TOTALS.c, unit: 'g', color: Colors.neonBlue },
-            { label: 'LIPIDES', value: TOTALS.f, unit: 'g', color: Colors.neonPink },
+            { label: 'CALORIES', value: totals.calories, unit: 'kcal', color: Colors.neonPurple },
+            { label: 'PROTÉINES', value: totals.protein, unit: 'g', color: Colors.electricGreen },
+            { label: 'GLUCIDES', value: totals.carbs, unit: 'g', color: Colors.neonBlue },
+            { label: 'LIPIDES', value: totals.fat, unit: 'g', color: Colors.neonPink },
           ].map((m) => (
             <View key={m.label} style={styles.totalItem}>
               <Text style={[styles.totalValue, { color: m.color }]}>{m.value}</Text>
@@ -58,24 +47,41 @@ export default function JournalScreen() {
           ))}
         </View>
 
-        {MEALS.map((group) => (
-          <View key={group.time} style={styles.mealGroup}>
-            <Text style={styles.groupLabel}>{group.time}</Text>
-            {group.entries.map((entry, i) => (
-              <View key={i} style={styles.entryRow}>
-                <Text style={styles.entryIcon}>{entry.icon}</Text>
-                <View style={styles.entryInfo}>
-                  <Text style={styles.entryName}>{entry.name}</Text>
-                  <Text style={styles.entryMacros}>
-                    P:{entry.p}g · G:{entry.c}g · L:{entry.f}g
-                  </Text>
-                </View>
-                <Text style={styles.entryKcal}>{entry.kcal}</Text>
-              </View>
-            ))}
+        {groups.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyIcon}>📋</Text>
+            <Text style={styles.emptyTitle}>JOURNAL VIDE</Text>
+            <Text style={styles.emptySub}>Scannez vos repas depuis le tableau de bord pour les voir apparaître ici.</Text>
           </View>
-        ))}
+        ) : (
+          groups.map((group) => (
+            <View key={group.mealTime} style={styles.mealGroup}>
+              <Text style={styles.groupLabel}>{group.label}</Text>
+              {group.entries.map((entry) => (
+                <View key={entry.id} style={styles.entryRow}>
+                  <Text style={styles.entryIcon}>{entry.icon}</Text>
+                  <View style={styles.entryInfo}>
+                    <Text style={styles.entryName}>{entry.foodName}</Text>
+                    <Text style={styles.entryMacros}>
+                      P:{entry.protein}g · G:{entry.carbs}g · L:{entry.fat}g
+                    </Text>
+                  </View>
+                  <Text style={styles.entryKcal}>{entry.calories}</Text>
+                  <Pressable
+                    onPress={() => removeEntry(entry.id)}
+                    hitSlop={8}
+                    accessibilityLabel="Supprimer cet aliment"
+                    style={styles.deleteBtn}
+                  >
+                    <Ionicons name="trash-outline" size={16} color={Colors.textMuted} />
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          ))
+        )}
 
+        <AdBanner />
         <View style={{ height: 24 }} />
       </ScrollView>
     </SafeAreaView>
@@ -92,11 +98,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xxl, fontWeight: '900', color: Colors.textPrimary,
     letterSpacing: 5, textShadowColor: Colors.neonBlue,
     textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10,
-  },
-  addBtn: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: Colors.neonPurple, alignItems: 'center', justifyContent: 'center',
-    shadowColor: Colors.neonPurple, shadowOpacity: 0.6, shadowRadius: 12, shadowOffset: { width: 0, height: 0 },
   },
   scroll: { flex: 1 },
   content: { paddingHorizontal: Spacing.lg },
@@ -126,4 +127,11 @@ const styles = StyleSheet.create({
   entryName: { fontSize: FontSize.md, color: Colors.textPrimary, fontWeight: '500' },
   entryMacros: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
   entryKcal: { fontSize: FontSize.md, color: Colors.neonPurple, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  deleteBtn: { padding: 4 },
+  emptyState: {
+    alignItems: 'center', paddingVertical: Spacing.xxl, gap: Spacing.sm,
+  },
+  emptyIcon: { fontSize: 48, marginBottom: Spacing.sm },
+  emptyTitle: { fontSize: FontSize.md, fontWeight: '900', color: Colors.textMuted, letterSpacing: 3 },
+  emptySub: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', lineHeight: 20 },
 });

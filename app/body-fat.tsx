@@ -14,11 +14,12 @@ import { usePremium } from '../store/PremiumContext';
 import { useUser } from '../store/UserContext';
 import { Paywall } from '../components/Paywall';
 import { analyzeBodyFat, BodyFatAnalysis } from '../services/claude';
+import { saveBodyFatResult } from '../services/database';
 
 export default function BodyFatScreen() {
   const router = useRouter();
   const { isPremium } = usePremium();
-  const { profile } = useUser();
+  const { profile, deviceId } = useUser();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<BodyFatAnalysis | null>(null);
 
@@ -60,6 +61,9 @@ export default function BodyFatScreen() {
       });
       setResult(analysis);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (deviceId) {
+        saveBodyFatResult(deviceId, analysis).catch(() => {});
+      }
     } catch {
       Alert.alert('Erreur d\'analyse', 'Impossible d\'analyser l\'image. Réessayez avec une meilleure photo (bonne luminosité, vue de face ou profil).');
     } finally {

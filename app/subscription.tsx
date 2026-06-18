@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,12 +12,15 @@ const FEATURES = [
   { icon: 'nutrition', title: 'Scan repas illimité', desc: 'Analysez tous vos repas sans restriction' },
   { icon: 'trending-up', title: 'Projections avancées', desc: 'Courbes de progression et macros optimisées' },
   { icon: 'flash', title: 'IA personnalisée', desc: 'Coach adaptatif avec mémoire longue durée' },
-  { icon: 'shield-checkmark', title: 'Données privées', desc: 'Stockage local chiffré, zéro revente' },
+  { icon: 'ban', title: 'Sans publicité', desc: 'Expérience sans interruption publicitaire' },
 ];
+
+type Plan = 'monthly' | 'yearly';
 
 export default function SubscriptionScreen() {
   const router = useRouter();
   const { isPremium, isPurchasing, subscribe, restore } = usePremium();
+  const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly');
 
   if (isPremium) {
     return (
@@ -64,11 +67,53 @@ export default function SubscriptionScreen() {
             </LinearGradient>
           </View>
           <Text style={styles.heroTitle}>{'NUTRASCAN\nPREMIUM'}</Text>
-          <View style={styles.priceRow}>
-            <Text style={styles.price}>9,99€</Text>
-            <Text style={styles.pricePer}>/mois</Text>
-          </View>
-          <Text style={styles.heroSub}>Résiliable à tout moment</Text>
+        </View>
+
+        {/* Plan toggle */}
+        <View style={styles.plansRow}>
+          <Pressable
+            style={[styles.planCard, selectedPlan === 'monthly' && styles.planCardActive]}
+            onPress={() => setSelectedPlan('monthly')}
+          >
+            {selectedPlan === 'monthly' && (
+              <LinearGradient
+                colors={[Colors.neonPurple + '18', Colors.neonPurple + '06']}
+                style={StyleSheet.absoluteFill}
+              />
+            )}
+            <Text style={[styles.planName, selectedPlan === 'monthly' && styles.planNameActive]}>MENSUEL</Text>
+            <View style={styles.planPriceRow}>
+              <Text style={[styles.planPrice, selectedPlan === 'monthly' && styles.planPriceActive]}>9,99€</Text>
+              <Text style={styles.planPer}>/mois</Text>
+            </View>
+            {selectedPlan === 'monthly' && (
+              <View style={styles.selectedDot} />
+            )}
+          </Pressable>
+
+          <Pressable
+            style={[styles.planCard, selectedPlan === 'yearly' && styles.planCardActive]}
+            onPress={() => setSelectedPlan('yearly')}
+          >
+            {selectedPlan === 'yearly' && (
+              <LinearGradient
+                colors={[Colors.neonPurple + '18', Colors.neonPurple + '06']}
+                style={StyleSheet.absoluteFill}
+              />
+            )}
+            <View style={styles.savingsBadge}>
+              <Text style={styles.savingsText}>−33%</Text>
+            </View>
+            <Text style={[styles.planName, selectedPlan === 'yearly' && styles.planNameActive]}>ANNUEL</Text>
+            <View style={styles.planPriceRow}>
+              <Text style={[styles.planPrice, selectedPlan === 'yearly' && styles.planPriceActive]}>79,99€</Text>
+              <Text style={styles.planPer}>/an</Text>
+            </View>
+            <Text style={styles.planEquiv}>soit 6,67€/mois</Text>
+            {selectedPlan === 'yearly' && (
+              <View style={styles.selectedDot} />
+            )}
+          </Pressable>
         </View>
 
         {/* Features list */}
@@ -93,7 +138,7 @@ export default function SubscriptionScreen() {
         {/* Subscribe CTA */}
         <Pressable
           style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }, isPurchasing && styles.ctaDisabled]}
-          onPress={subscribe}
+          onPress={() => subscribe(selectedPlan)}
           disabled={isPurchasing}
           accessibilityRole="button"
           accessibilityLabel="S'abonner à Premium"
@@ -106,7 +151,11 @@ export default function SubscriptionScreen() {
           >
             <Ionicons name="flash" size={20} color="#fff" />
             <Text style={styles.ctaText}>
-              {isPurchasing ? 'TRAITEMENT...' : "S'ABONNER MAINTENANT"}
+              {isPurchasing
+                ? 'TRAITEMENT...'
+                : selectedPlan === 'yearly'
+                ? "S'ABONNER · 79,99€/AN"
+                : "S'ABONNER · 9,99€/MOIS"}
             </Text>
           </LinearGradient>
         </Pressable>
@@ -117,7 +166,9 @@ export default function SubscriptionScreen() {
         </Pressable>
 
         <Text style={styles.legal}>
-          {'L\'abonnement se renouvelle automatiquement chaque mois au tarif de 9,99€ sauf résiliation 24h avant l\'échéance.\n'}
+          {selectedPlan === 'yearly'
+            ? "L'abonnement se renouvelle automatiquement chaque année au tarif de 79,99€ sauf résiliation 24h avant l'échéance.\n"
+            : "L'abonnement se renouvelle automatiquement chaque mois au tarif de 9,99€ sauf résiliation 24h avant l'échéance.\n"}
           {Platform.select({
             ios: 'Gérez vos abonnements dans Réglages > Apple ID > Abonnements.',
             android: 'Gérez vos abonnements dans le Play Store > Abonnements.',
@@ -145,8 +196,8 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: Spacing.lg },
 
   hero: {
-    alignItems: 'center', paddingVertical: Spacing.xl, borderRadius: BorderRadius.xl,
-    overflow: 'hidden', marginBottom: Spacing.lg,
+    alignItems: 'center', paddingTop: Spacing.xl, paddingBottom: Spacing.lg,
+    borderRadius: BorderRadius.xl, overflow: 'hidden', marginBottom: Spacing.lg,
     borderWidth: 1, borderColor: Colors.neonPurple + '30',
   },
   heroIconWrap: { marginBottom: Spacing.lg },
@@ -158,13 +209,35 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontSize: 28, fontWeight: '900', color: Colors.textPrimary, letterSpacing: 5,
-    textAlign: 'center', marginBottom: Spacing.md,
+    textAlign: 'center',
     textShadowColor: Colors.neonPurple, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16,
   },
-  priceRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 4 },
-  price: { fontSize: 44, fontWeight: '900', color: Colors.neonPurple, fontVariant: ['tabular-nums'] },
-  pricePer: { fontSize: FontSize.md, color: Colors.textMuted, marginBottom: 8, marginLeft: 4 },
-  heroSub: { fontSize: FontSize.xs, color: Colors.textMuted, letterSpacing: 1 },
+
+  plansRow: { flexDirection: 'row', gap: Spacing.md, marginBottom: Spacing.lg },
+  planCard: {
+    flex: 1, borderRadius: BorderRadius.xl, overflow: 'hidden',
+    borderWidth: 1, borderColor: Colors.border, padding: Spacing.lg,
+    backgroundColor: Colors.surface, alignItems: 'center', gap: 4, minHeight: 120,
+    position: 'relative',
+  },
+  planCardActive: { borderColor: Colors.neonPurple + '70' },
+  planName: { fontSize: FontSize.xs, color: Colors.textMuted, letterSpacing: 2, fontWeight: '700' },
+  planNameActive: { color: Colors.neonPurple },
+  planPriceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 2 },
+  planPrice: { fontSize: 26, fontWeight: '900', color: Colors.textPrimary, fontVariant: ['tabular-nums'] },
+  planPriceActive: { color: Colors.neonPurple },
+  planPer: { fontSize: FontSize.xs, color: Colors.textMuted, marginBottom: 4 },
+  planEquiv: { fontSize: 10, color: Colors.textMuted, letterSpacing: 0.5 },
+  savingsBadge: {
+    position: 'absolute', top: 10, right: 10,
+    backgroundColor: Colors.electricGreen + '20', borderRadius: BorderRadius.full,
+    paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: Colors.electricGreen + '40',
+  },
+  savingsText: { fontSize: 10, fontWeight: '900', color: Colors.electricGreen, letterSpacing: 0.5 },
+  selectedDot: {
+    width: 8, height: 8, borderRadius: 4,
+    backgroundColor: Colors.neonPurple, marginTop: 4,
+  },
 
   featuresPanel: {
     backgroundColor: Colors.surface, borderRadius: BorderRadius.xl,
@@ -191,7 +264,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     paddingVertical: 18, gap: 10,
   },
-  ctaText: { color: '#fff', fontSize: FontSize.md, fontWeight: '900', letterSpacing: 2 },
+  ctaText: { color: '#fff', fontSize: FontSize.md, fontWeight: '900', letterSpacing: 1.5 },
 
   restoreBtn: { alignItems: 'center', paddingVertical: Spacing.md, marginBottom: Spacing.lg },
   restoreText: { fontSize: FontSize.sm, color: Colors.textMuted, textDecorationLine: 'underline' },

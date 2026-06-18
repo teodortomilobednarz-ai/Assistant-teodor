@@ -14,6 +14,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Colors } from '../constants/theme';
 import { UserProvider } from '../store/UserContext';
 import { PremiumProvider } from '../store/PremiumContext';
+import { DailyLogProvider } from '../store/DailyLogContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,6 +39,7 @@ export default function RootLayout() {
   return (
     <UserProvider>
       <PremiumProvider>
+        <DailyLogProvider>
         <StatusBar style="light" />
         <Stack
           screenOptions={{
@@ -61,7 +63,12 @@ export default function RootLayout() {
             name="subscription"
             options={{ animation: 'slide_from_bottom' }}
           />
+          <Stack.Screen
+            name="edit-profile"
+            options={{ animation: 'slide_from_bottom' }}
+          />
         </Stack>
+        </DailyLogProvider>
       </PremiumProvider>
     </UserProvider>
   );

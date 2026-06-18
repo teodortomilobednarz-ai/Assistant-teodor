@@ -7,7 +7,6 @@ import {
   Image,
   Pressable,
   Platform,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -27,12 +26,16 @@ import { Colors, Spacing, BorderRadius, FontSize } from '../constants/theme';
 import { MacroStatCard } from '../components/MacroStatCard';
 import { GamificationAlert } from '../components/GamificationAlert';
 import { ScanResult } from '../types/nutrition';
+import { useDailyLog } from '../store/DailyLogContext';
+import { useUser } from '../store/UserContext';
 
 const SCAN_DURATION = 1800;
 
 export default function ScanResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ data: string }>();
+  const { addEntry } = useDailyLog();
+  const { deviceId } = useUser();
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [showResults, setShowResults] = useState(false);
@@ -88,17 +91,21 @@ export default function ScanResultScreen() {
     transform: [{ translateY: headerSlide.value }],
   }));
 
-  const handleAddToLog = () => {
-    Alert.alert(
-      'REPAS ENREGISTRÉ',
-      `${scanResult?.food.name} ajouté à votre journal alimentaire. Bonne nutrition, Capitaine !`,
-      [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ]
+  const handleAddToLog = async () => {
+    if (!scanResult) return;
+    await addEntry(
+      {
+        foodName: scanResult.food.name,
+        calories: scanResult.food.macros.calories,
+        protein: scanResult.food.macros.protein,
+        carbs: scanResult.food.macros.carbs,
+        fat: scanResult.food.macros.fat,
+        mealTime: 'snack',
+        icon: scanResult.food.emoji,
+      },
+      deviceId
     );
+    router.back();
   };
 
   if (!scanResult) return null;

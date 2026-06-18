@@ -36,6 +36,13 @@
           "photosPermission": "Nutrascan accède à vos photos pour analyser vos repas.",
           "cameraPermission": "Nutrascan accède à votre caméra pour scanner vos aliments."
         }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "EXPO_PUBLIC_ADMOB_ANDROID_APP_ID",
+          "iosAppId": "EXPO_PUBLIC_ADMOB_IOS_APP_ID"
+        }
       ]
     ],
     "experiments": {
