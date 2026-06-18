@@ -195,30 +195,60 @@ Apple répond généralement en **24-48 heures**.
 
 ## Ce que tu n'as pas à faire
 
-- ✅ Code → fait
-- ✅ Design UI → fait
-- ✅ Icônes (icon.png, adaptive-icon.png, splash-icon.png) → générées
-- ✅ Politique de confidentialité → rédigée (store-assets/privacy-policy.html)
-- ✅ Métadonnées App Store (description, mots-clés) → rédigées
-- ✅ Base de données schema → prête (db-schema.sql)
+- ✅ Code complet → fait
+- ✅ Design UI cyberpunk → fait
+- ✅ Icônes (icon.png, adaptive-icon.png, splash-icon.png, favicon.png) → générées
+- ✅ Politique de confidentialité RGPD → rédigée (store-assets/privacy-policy.html)
+- ✅ Métadonnées App Store (description, mots-clés, IAP) → rédigées
+- ✅ Base de données schema Supabase → prête (db-schema.sql)
 - ✅ EAS configuré → structure prête, juste remplir les IDs
 - ✅ TypeScript 0 erreur → vérifié
+- ✅ ATT (App Tracking Transparency) → implémenté (obligatoire pour AdMob iOS)
+- ✅ Notation App Store → demandée après le 5ème scan (expo-store-review)
+- ✅ Gestion erreurs réseau → timeout 30s + messages français actionnables
+- ✅ Notifications push → rappels repas 12h30 et 20h00 (expo-notifications)
+- ✅ Historique du poids → graphique SVG de progression dans le profil
+- ✅ ErrorBoundary → écran de crash élégant, pas de plantage silencieux
+- ✅ iOS 17+ Privacy Manifest → PrivacyInfo.xcprivacy via config plugin
+- ✅ GitHub Actions CI → TypeScript check + Expo Doctor automatiques
+- ✅ Badge onglet Journal → nombre d'entrées du jour
+- ✅ Haptics → retour tactile sur les actions importantes
+- ✅ Journalisation du poids → au premier lancement + à chaque mise à jour profil
+- ✅ Peer dependencies → expo-linking + react-native-worklets-core installés
 
 ---
 
 ## Ce que tu dois faire (ta checklist)
 
-- [ ] Remplir `.env` (Anthropic + Supabase + AdMob)
-- [ ] Exécuter `db-schema.sql` dans Supabase
-- [ ] Mettre les vrais App IDs dans `app.json`
-- [ ] Créer compte Apple Developer (99$/an)
-- [ ] Créer la fiche app dans App Store Connect
-- [ ] Créer les 2 produits IAP dans App Store Connect
-- [ ] Héberger `privacy-policy.html` (GitHub Pages)
-- [ ] Remplir `eas.json` avec tes IDs Apple
-- [ ] `eas secret:create` pour chaque variable
-- [ ] `eas build --platform ios --profile production`
-- [ ] Faire les 5 screenshots dans le Simulator
-- [ ] `eas submit --platform ios --latest`
-- [ ] Remplir les informations dans App Store Connect
-- [ ] Soumettre pour examen Apple
+### AVANT LE BUILD — Configuration (toi)
+
+- [ ] **`.env`** — remplir les clés : Anthropic API key + Supabase URL & anon key + 6 Ad Unit IDs AdMob
+- [ ] **`db-schema.sql`** — coller dans Supabase SQL Editor → Run
+- [ ] **`app.json`** — remplacer `EXPO_PUBLIC_ADMOB_ANDROID_APP_ID` et `EXPO_PUBLIC_ADMOB_IOS_APP_ID` par tes vrais App IDs AdMob
+- [ ] **`eas.json`** — remplir `appleId`, `ascAppId`, `appleTeamId`
+
+### COMPTES & SERVICES (toi)
+
+- [ ] **Compte Apple Developer** → developer.apple.com/programs (99$/an) → noter ton Team ID
+- [ ] **App Store Connect** → créer la fiche Nutrascan (Bundle ID : `com.nutrascan.app`)
+- [ ] **IAP dans App Store Connect** → créer 2 abonnements auto-renouvelables :
+  - `com.nutrascan.app.premium_monthly` → 9,99€/mois
+  - `com.nutrascan.app.premium_yearly` → 79,99€/an
+- [ ] **Héberger la privacy policy** → GitHub Pages avec `store-assets/privacy-policy.html` → coller l'URL dans App Store Connect
+
+### BUILD & SOUMISSION (terminal)
+
+- [ ] `npx eas-cli login` → connecte-toi à Expo
+- [ ] `eas secret:create` → configurer les 9 variables (voir Étape 7C ci-dessus)
+- [ ] `eas build --platform ios --profile production` → build (~25 min sur serveurs EAS)
+- [ ] Tester le build sur TestFlight avant de soumettre
+- [ ] Ajouter les 5 screenshots (format 1290×2796 — voir `store-assets/screenshots/`)
+- [ ] `eas submit --platform ios --latest` → envoyer sur App Store Connect
+- [ ] Soumettre pour examen Apple (réponse sous 24-48h)
+
+### OPTIONNEL MAIS RECOMMANDÉ
+
+- [ ] Configurer l'EXPO_TOKEN dans les secrets GitHub (pour le CI `build-ios` sur `main`)
+- [ ] Tester les notifications sur un vrai device iOS (pas disponible dans Simulator)
+- [ ] Vérifier l'ATT dialog sur un vrai device iOS 14.5+
+- [ ] Tester le flow IAP en sandbox (compte de test Apple Sandbox)
