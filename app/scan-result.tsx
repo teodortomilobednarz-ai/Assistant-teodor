@@ -28,6 +28,7 @@ import { GamificationAlert } from '../components/GamificationAlert';
 import { ScanResult } from '../types/nutrition';
 import { useDailyLog } from '../store/DailyLogContext';
 import { useUser } from '../store/UserContext';
+import { useStoreReview } from '../hooks/useStoreReview';
 
 const SCAN_DURATION = 1800;
 
@@ -36,6 +37,7 @@ export default function ScanResultScreen() {
   const params = useLocalSearchParams<{ data: string }>();
   const { addEntry } = useDailyLog();
   const { deviceId } = useUser();
+  const { recordScan } = useStoreReview();
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [showResults, setShowResults] = useState(false);
@@ -105,6 +107,7 @@ export default function ScanResultScreen() {
       },
       deviceId
     );
+    recordScan();
     router.back();
   };
 

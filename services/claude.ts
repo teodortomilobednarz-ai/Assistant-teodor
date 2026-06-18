@@ -2,9 +2,9 @@ import { MacroNutrients } from '../types/nutrition';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-haiku-4-5-20251001';
-
-// Store your API key in a secure environment variable — never hardcode it
 const API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY ?? '';
+
+const TIMEOUT_MS = 30_000;
 
 export interface MealAnalysis {
   foods: Array<{
@@ -34,42 +34,68 @@ async function callClaude(
   prompt: string,
   mediaType: 'image/jpeg' | 'image/png' = 'image/jpeg'
 ): Promise<string> {
-  const response = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: mediaType,
-                data: imageBase64,
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1024,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: { type: 'base64', media_type: mediaType, data: imageBase64 },
               },
-            },
-            { type: 'text', text: prompt },
-          ],
-        },
-      ],
-    }),
-  });
+              { type: 'text', text: prompt },
+            ],
+          },
+        ],
+      }),
+    });
+  } catch (err: any) {
+    if (err?.name === 'AbortError') {
+      throw new Error('timeout');
+    }
+    throw new Error('network');
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(`Claude API error ${response.status}: ${JSON.stringify(error)}`);
+    const status = response.status;
+    if (status === 401) throw new Error('Clé API invalide. Vérifie ta configuration.');
+    if (status === 429) throw new Error('Limite API atteinte. Réessaie dans quelques secondes.');
+    if (status >= 500) throw new Error('network');
+    throw new Error(`Claude API error ${status}: ${JSON.stringify(error)}`);
   }
 
   const data = await response.json();
   return data.content[0].text as string;
+}
+
+function parseJson<T>(raw: string): T | null {
+  try {
+    const cleaned = raw
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+    return JSON.parse(cleaned) as T;
+  } catch {
+    return null;
+  }
 }
 
 export async function analyzeMeal(imageBase64: string): Promise<MealAnalysis> {
@@ -85,19 +111,16 @@ export async function analyzeMeal(imageBase64: string): Promise<MealAnalysis> {
 Estime les grammes de macros avec précision. Si tu ne peux pas identifier un aliment, marque confidence < 0.5.`;
 
   const raw = await callClaude(imageBase64, prompt);
+  const parsed = parseJson<MealAnalysis>(raw);
 
-  try {
-    const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(cleaned) as MealAnalysis;
-  } catch {
-    // Fallback mock if parsing fails
-    return {
-      foods: [{ name: 'Aliment non identifié', quantity: 'Portion estimée', calories: 400, protein: 20, carbs: 40, fat: 15 }],
-      totals: { calories: 400, protein: 20, carbs: 40, fat: 15 },
-      confidence: 0.3,
-      description: 'Analyse incomplète — image difficile à interpréter.',
-    };
-  }
+  if (parsed) return parsed;
+
+  return {
+    foods: [{ name: 'Aliment non identifié', quantity: 'Portion estimée', calories: 400, protein: 20, carbs: 40, fat: 15 }],
+    totals: { calories: 400, protein: 20, carbs: 40, fat: 15 },
+    confidence: 0.3,
+    description: 'Analyse incomplète — image difficile à interpréter.',
+  };
 }
 
 export async function analyzeBodyFat(
@@ -123,18 +146,16 @@ Catégories : Essential Fat / Athletes / Fitness / Average / Obese.
 Sois honnête et scientifique. confidence entre 0.5 et 0.85 pour une photo.`;
 
   const raw = await callClaude(imageBase64, prompt);
+  const parsed = parseJson<BodyFatAnalysis>(raw);
 
-  try {
-    const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(cleaned) as BodyFatAnalysis;
-  } catch {
-    return {
-      estimatedBodyFatPct: 0,
-      leanMassKg: 0,
-      fatMassKg: 0,
-      category: 'Inconnu',
-      recommendations: ['Image insuffisante pour l\'analyse.'],
-      confidence: 0,
-    };
-  }
+  if (parsed) return parsed;
+
+  return {
+    estimatedBodyFatPct: 0,
+    leanMassKg: 0,
+    fatMassKg: 0,
+    category: 'Inconnu',
+    recommendations: ["Image insuffisante pour l'analyse."],
+    confidence: 0,
+  };
 }

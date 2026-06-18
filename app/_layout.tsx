@@ -15,8 +15,46 @@ import { Colors } from '../constants/theme';
 import { UserProvider } from '../store/UserContext';
 import { PremiumProvider } from '../store/PremiumContext';
 import { DailyLogProvider } from '../store/DailyLogContext';
+import { useATT } from '../hooks/useATT';
 
 SplashScreen.preventAutoHideAsync();
+
+function AppShell() {
+  useATT();
+
+  return (
+    <>
+      <StatusBar style="light" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: Colors.background },
+          animation: 'slide_from_right',
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen
+          name="scan-result"
+          options={{ animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="body-fat"
+          options={{ animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="subscription"
+          options={{ animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="edit-profile"
+          options={{ animation: 'slide_from_bottom' }}
+        />
+      </Stack>
+    </>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -40,34 +78,7 @@ export default function RootLayout() {
     <UserProvider>
       <PremiumProvider>
         <DailyLogProvider>
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: Colors.background },
-            animation: 'slide_from_right',
-          }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen
-            name="scan-result"
-            options={{ animation: 'slide_from_bottom' }}
-          />
-          <Stack.Screen
-            name="body-fat"
-            options={{ animation: 'slide_from_bottom' }}
-          />
-          <Stack.Screen
-            name="subscription"
-            options={{ animation: 'slide_from_bottom' }}
-          />
-          <Stack.Screen
-            name="edit-profile"
-            options={{ animation: 'slide_from_bottom' }}
-          />
-        </Stack>
+          <AppShell />
         </DailyLogProvider>
       </PremiumProvider>
     </UserProvider>
