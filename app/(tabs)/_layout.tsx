@@ -1,18 +1,25 @@
 import { Tabs } from 'expo-router';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, BorderRadius } from '../../constants/theme';
+import { useDailyLog } from '../../store/DailyLogContext';
 
-function TabIcon({ name, color, focused }: { name: string; color: string; focused: boolean }) {
+function TabIcon({ name, color, focused, badge }: { name: string; color: string; focused: boolean; badge?: number }) {
   return (
     <View style={[styles.iconWrapper, focused && { backgroundColor: color + '18' }]}>
       <Ionicons name={name as any} size={22} color={color} />
       {focused && <View style={[styles.activeDot, { backgroundColor: color }]} />}
+      {!!badge && badge > 0 && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{badge > 9 ? '9+' : badge}</Text>
+        </View>
+      )}
     </View>
   );
 }
 
 export default function TabsLayout() {
+  const { entries } = useDailyLog();
   return (
     <Tabs
       screenOptions={{
@@ -38,7 +45,7 @@ export default function TabsLayout() {
         options={{
           title: 'Journal',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name={focused ? 'book' : 'book-outline'} color={color as string} focused={focused} />
+            <TabIcon name={focused ? 'book' : 'book-outline'} color={color as string} focused={focused} badge={entries.length} />
           ),
         }}
       />
@@ -86,5 +93,22 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: Colors.neonPurple,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    fontSize: 9,
+    color: '#fff',
+    fontWeight: '900',
   },
 });
