@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Colors, Spacing, BorderRadius, FontSize } from '../../constants/theme';
 import { useDailyLog, FoodEntry } from '../../store/DailyLogContext';
 import { AdBanner } from '../../components/AdBanner';
@@ -68,7 +69,10 @@ export default function JournalScreen() {
                   </View>
                   <Text style={styles.entryKcal}>{entry.calories}</Text>
                   <Pressable
-                    onPress={() => removeEntry(entry.id)}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      removeEntry(entry.id);
+                    }}
                     hitSlop={8}
                     accessibilityLabel="Supprimer cet aliment"
                     style={styles.deleteBtn}

@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
 import { Colors, Spacing, BorderRadius, FontSize } from '../../constants/theme';
 import { useUser } from '../../store/UserContext';
 import { usePremium } from '../../store/PremiumContext';
@@ -31,6 +32,7 @@ export default function ProfileScreen() {
   }, []);
 
   const handleToggleNotif = async (value: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setNotifEnabled(value);
     await AsyncStorage.setItem(NOTIF_KEY, String(value));
     await scheduleMealReminders(value);

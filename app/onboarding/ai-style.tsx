@@ -12,12 +12,14 @@ import * as Haptics from 'expo-haptics';
 import { Colors, Spacing, BorderRadius, FontSize } from '../../constants/theme';
 import { AI_PERSONALITIES, AiStyle } from '../../constants/aiPersonalities';
 import { useUser } from '../../store/UserContext';
+import { useWeightHistory } from '../../store/WeightHistoryContext';
 import { UserProfile } from '../../services/bmr';
 
 export default function AiStyleScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<Record<string, string>>();
   const { saveProfile } = useUser();
+  const { addEntry: addWeightEntry } = useWeightHistory();
   const [selected, setSelected] = useState<AiStyle>('rpg');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -38,6 +40,7 @@ export default function AiStyleScreen() {
     };
 
     await saveProfile(profile);
+    await addWeightEntry(+params.weightKg).catch(() => {});
     router.replace('/(tabs)');
   }, [isSaving, params, selected, saveProfile, router]);
 
