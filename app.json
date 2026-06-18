@@ -38,6 +38,16 @@
     },
     "plugins": [
       "expo-router",
+      "./plugins/withPrivacyManifest",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#7C3AED",
+          "defaultChannel": "reminders",
+          "sounds": []
+        }
+      ],
       [
         "expo-image-picker",
         {

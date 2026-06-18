@@ -15,6 +15,8 @@ import { Colors } from '../constants/theme';
 import { UserProvider } from '../store/UserContext';
 import { PremiumProvider } from '../store/PremiumContext';
 import { DailyLogProvider } from '../store/DailyLogContext';
+import { WeightHistoryProvider } from '../store/WeightHistoryContext';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { useATT } from '../hooks/useATT';
 
 SplashScreen.preventAutoHideAsync();
@@ -35,22 +37,10 @@ function AppShell() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" />
-        <Stack.Screen
-          name="scan-result"
-          options={{ animation: 'slide_from_bottom' }}
-        />
-        <Stack.Screen
-          name="body-fat"
-          options={{ animation: 'slide_from_bottom' }}
-        />
-        <Stack.Screen
-          name="subscription"
-          options={{ animation: 'slide_from_bottom' }}
-        />
-        <Stack.Screen
-          name="edit-profile"
-          options={{ animation: 'slide_from_bottom' }}
-        />
+        <Stack.Screen name="scan-result"   options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="body-fat"      options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="subscription"  options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="edit-profile"  options={{ animation: 'slide_from_bottom' }} />
       </Stack>
     </>
   );
@@ -70,17 +60,19 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  if (!fontsLoaded && !fontError) return null;
 
   return (
-    <UserProvider>
-      <PremiumProvider>
-        <DailyLogProvider>
-          <AppShell />
-        </DailyLogProvider>
-      </PremiumProvider>
-    </UserProvider>
+    <ErrorBoundary>
+      <UserProvider>
+        <PremiumProvider>
+          <DailyLogProvider>
+            <WeightHistoryProvider>
+              <AppShell />
+            </WeightHistoryProvider>
+          </DailyLogProvider>
+        </PremiumProvider>
+      </UserProvider>
+    </ErrorBoundary>
   );
 }

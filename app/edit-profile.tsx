@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, BorderRadius, FontSize } from '../constants/theme';
 import { useUser } from '../store/UserContext';
+import { useWeightHistory } from '../store/WeightHistoryContext';
 import type { ActivityLevel, Goal } from '../services/bmr';
 import { ACTIVITY_LABELS } from '../services/bmr';
 
@@ -21,6 +22,7 @@ const ACTIVITIES: ActivityLevel[] = ['sedentary', 'light', 'moderate', 'active',
 export default function EditProfileScreen() {
   const router = useRouter();
   const { profile, saveProfile } = useUser();
+  const { addEntry: addWeightEntry } = useWeightHistory();
 
   const [weightKg, setWeightKg] = useState(String(profile?.weightKg ?? ''));
   const [targetWeightKg, setTargetWeightKg] = useState(String(profile?.targetWeightKg ?? ''));
@@ -48,6 +50,9 @@ export default function EditProfileScreen() {
     setIsSaving(true);
     try {
       await saveProfile({ ...profile, weightKg: w, targetWeightKg: tw, activityLevel, goal });
+      if (w !== profile.weightKg) {
+        await addWeightEntry(w);
+      }
       router.back();
     } finally {
       setIsSaving(false);
