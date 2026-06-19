@@ -47,6 +47,10 @@ alter table user_profiles enable row level security;
 alter table body_fat_analyses enable row level security;
 alter table daily_food_logs enable row level security;
 
+drop policy if exists "Allow all for anon" on user_profiles;
+drop policy if exists "Allow all for anon" on body_fat_analyses;
+drop policy if exists "Allow all for anon" on daily_food_logs;
+
 create policy "Allow all for anon" on user_profiles for all to anon using (true) with check (true);
 create policy "Allow all for anon" on body_fat_analyses for all to anon using (true) with check (true);
 create policy "Allow all for anon" on daily_food_logs for all to anon using (true) with check (true);
