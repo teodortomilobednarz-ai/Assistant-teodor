@@ -31,7 +31,7 @@
     "production": {
       "ios": {
         "appleId": "REMPLIS_ICI_TON_APPLE_ID",
-        "ascAppId": "REMPLIS_ICI_LAPP_ID_APP_STORE_CONNECT",
+        "ascAppId": "6782119151",
         "appleTeamId": "REMPLIS_ICI_TON_TEAM_ID"
       },
       "android": {
