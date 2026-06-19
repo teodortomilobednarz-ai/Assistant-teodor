@@ -58,3 +58,10 @@ create policy "Allow all for anon" on daily_food_logs for all to anon using (tru
 -- Index for log queries by device + date
 create index if not exists idx_food_logs_device_date on daily_food_logs(device_id, log_date);
 create index if not exists idx_body_fat_device on body_fat_analyses(device_id, created_at desc);
+
+-- Sign In with Apple / cross-device sync
+-- Run this migration once after the initial schema is in place:
+alter table user_profiles
+  add column if not exists user_id uuid references auth.users(id) on delete set null;
+
+create index if not exists idx_user_profiles_user_id on user_profiles(user_id);

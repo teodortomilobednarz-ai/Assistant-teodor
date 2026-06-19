@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Switch, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { Colors, Spacing, BorderRadius, FontSize } from '../../constants/theme';
 import { useUser } from '../../store/UserContext';
 import { usePremium } from '../../store/PremiumContext';
 import { useWeightHistory } from '../../store/WeightHistoryContext';
+import { useAuth } from '../../store/AuthContext';
 import { AI_PERSONALITIES } from '../../constants/aiPersonalities';
 import { ACTIVITY_LABELS } from '../../services/bmr';
 import { AdBanner } from '../../components/AdBanner';
@@ -20,9 +22,10 @@ const NOTIF_KEY = '@nutrascan_notifications_enabled';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { profile, goals, clearProfile } = useUser();
+  const { profile, goals, clearProfile, deviceId } = useUser();
   const { isPremium } = usePremium();
   const { entries: weightEntries } = useWeightHistory();
+  const { authUser, isSignedIn, loginWithApple, logout } = useAuth();
   const [notifEnabled, setNotifEnabled] = useState(false);
 
   const personality = profile ? AI_PERSONALITIES[profile.aiStyle] : null;
@@ -159,6 +162,55 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* Apple Account / Sync */}
+        {Platform.OS === 'ios' && (
+          <View style={styles.panel}>
+            <SectionHeader label="COMPTE & SYNCHRONISATION" color={Colors.neonBlue} />
+            {isSignedIn ? (
+              <>
+                <View style={styles.accountRow}>
+                  <View style={styles.accountIcon}>
+                    <Ionicons name="person-circle" size={28} color={Colors.neonBlue} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    {authUser?.fullName ? (
+                      <Text style={styles.accountName}>{authUser.fullName}</Text>
+                    ) : null}
+                    <Text style={styles.accountEmail}>{authUser?.email ?? 'Apple ID connecté'}</Text>
+                    <Text style={styles.accountSync}>✓ Données synchronisées sur tous vos appareils</Text>
+                  </View>
+                </View>
+                <Pressable
+                  style={[styles.actionRow, { marginTop: Spacing.sm }]}
+                  onPress={() => {
+                    Alert.alert('Se déconnecter', 'Vos données locales seront conservées.', [
+                      { text: 'Annuler', style: 'cancel' },
+                      { text: 'Déconnecter', style: 'destructive', onPress: logout },
+                    ]);
+                  }}
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="log-out-outline" size={18} color={Colors.neonPink} />
+                  <Text style={[styles.actionText, { color: Colors.neonPink }]}>Se déconnecter</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Text style={styles.syncDesc}>
+                  Connectez-vous avec Apple ID pour accéder à vos données sur tous vos appareils.
+                </Text>
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                  cornerRadius={12}
+                  style={styles.appleBtn}
+                  onPress={() => loginWithApple(deviceId)}
+                />
+              </>
+            )}
+          </View>
+        )}
+
         {/* Actions */}
         <View style={styles.panel}>
           <SectionHeader label="ACTIONS" color={Colors.textMuted} />
@@ -258,4 +310,16 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md, minHeight: 44,
   },
   actionText: { fontSize: FontSize.md, fontWeight: '600' },
+  accountRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  accountIcon: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: Colors.neonBlue + '15',
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: Colors.neonBlue + '30',
+  },
+  accountName: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary },
+  accountEmail: { fontSize: FontSize.sm, color: Colors.textSecondary },
+  accountSync: { fontSize: FontSize.xs, color: Colors.electricGreen, marginTop: 2 },
+  syncDesc: { fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 20, marginBottom: Spacing.md },
+  appleBtn: { width: '100%' as const, height: 44 },
 });

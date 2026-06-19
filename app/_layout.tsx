@@ -16,6 +16,7 @@ import { UserProvider } from '../store/UserContext';
 import { PremiumProvider } from '../store/PremiumContext';
 import { DailyLogProvider } from '../store/DailyLogContext';
 import { WeightHistoryProvider } from '../store/WeightHistoryContext';
+import { AuthProvider } from '../store/AuthContext';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { useATT } from '../hooks/useATT';
 
@@ -68,7 +69,9 @@ export default function RootLayout() {
         <PremiumProvider>
           <DailyLogProvider>
             <WeightHistoryProvider>
-              <AppShell />
+              <AuthProvider>
+                <AppShell />
+              </AuthProvider>
             </WeightHistoryProvider>
           </DailyLogProvider>
         </PremiumProvider>

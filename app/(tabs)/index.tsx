@@ -19,6 +19,7 @@ import { usePremium } from '../../store/PremiumContext';
 import { useDailyLog } from '../../store/DailyLogContext';
 import { useRealScan } from '../../hooks/useRealScan';
 import { useInterstitial } from '../../hooks/useInterstitial';
+import { useHealthKit } from '../../hooks/useHealthKit';
 import { AI_PERSONALITIES } from '../../constants/aiPersonalities';
 import type { ScanResult } from '../../types/nutrition';
 
@@ -31,6 +32,7 @@ export default function DashboardScreen() {
   const { totals } = useDailyLog();
   const { isScanning, scanWithCamera, scanFromGallery } = useRealScan();
   const { showAd } = useInterstitial();
+  const { steps, bonusKcal, isAvailable: healthAvailable } = useHealthKit();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [xpPopup, setXpPopup] = useState<{
@@ -38,10 +40,11 @@ export default function DashboardScreen() {
   }>({ visible: false, title: '', description: '', xp: 0, color: Colors.electricGreen });
 
   const dailyGoals = goals ?? DEFAULT_GOALS;
+  const adjustedCalories = dailyGoals.calories + bonusKcal;
   const personality = profile ? AI_PERSONALITIES[profile.aiStyle] : AI_PERSONALITIES.rpg;
-  const caloriesPct = (totals.calories / dailyGoals.calories) * 100;
+  const caloriesPct = (totals.calories / adjustedCalories) * 100;
   const isOverLimit = caloriesPct > 100;
-  const remaining = Math.max(dailyGoals.calories - totals.calories, 0);
+  const remaining = Math.max(adjustedCalories - totals.calories, 0);
 
   const showXP = useCallback((message: string, color: string, xp: number) => {
     setXpPopup({ visible: true, title: personality.name, description: message, xp, color });
@@ -138,15 +141,18 @@ export default function DashboardScreen() {
             )}
           </View>
           <View style={styles.ringRow}>
-            <CalorieRing current={totals.calories} goal={dailyGoals.calories} />
+            <CalorieRing current={totals.calories} goal={adjustedCalories} />
             <View style={styles.ringStats}>
-              <StatRow label="OBJECTIF" value={`${dailyGoals.calories} kcal`} color={Colors.textMuted} />
+              <StatRow label="OBJECTIF" value={`${adjustedCalories} kcal`} color={Colors.textMuted} />
               <StatRow label="CONSOMMÉ" value={`${totals.calories} kcal`} color={Colors.neonPurple} />
               <StatRow
                 label="RESTANT"
                 value={`${remaining} kcal`}
                 color={isOverLimit ? Colors.neonPink : Colors.electricGreen}
               />
+              {healthAvailable && bonusKcal > 0 && (
+                <StatRow label={`+${steps.toLocaleString('fr')} PAS`} value={`+${bonusKcal} kcal`} color={Colors.electricGreen} />
+              )}
             </View>
           </View>
         </View>
