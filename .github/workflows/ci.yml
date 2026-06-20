@@ -38,38 +38,6 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-  build-ios-preview:
-    name: EAS Build (iOS preview)
-    runs-on: ubuntu-latest
-    needs: [typecheck]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci --legacy-peer-deps
-      - uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-      - name: Write ASC API Key
-        run: echo "${{ secrets.ASC_PRIVATE_KEY }}" > /tmp/asc-key.p8
-      - name: Build iOS preview
-        run: eas build --platform ios --profile preview --non-interactive
-        env:
-          EXPO_PUBLIC_ANTHROPIC_API_KEY: ${{ secrets.EXPO_PUBLIC_ANTHROPIC_API_KEY }}
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
-          EXPO_PUBLIC_ADMOB_IOS_APP_ID: ${{ secrets.EXPO_PUBLIC_ADMOB_IOS_APP_ID }}
-          EXPO_PUBLIC_ADMOB_BANNER_IOS: ${{ secrets.EXPO_PUBLIC_ADMOB_BANNER_IOS }}
-          EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS: ${{ secrets.EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_PATH: /tmp/asc-key.p8
-
   build-ios-production:
     name: EAS Build (iOS production)
     runs-on: ubuntu-latest
@@ -88,7 +56,9 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Write ASC API Key
-        run: echo "${{ secrets.ASC_PRIVATE_KEY }}" > /tmp/asc-key.p8
+        run: printf '%s' "$ASC_PRIVATE_KEY" > /tmp/asc-key.p8
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
       - name: Build iOS production
         run: eas build --platform ios --profile ${{ github.event.inputs.profile }} --non-interactive
         env:
@@ -98,16 +68,13 @@ jobs:
           EXPO_PUBLIC_ADMOB_IOS_APP_ID: ${{ secrets.EXPO_PUBLIC_ADMOB_IOS_APP_ID }}
           EXPO_PUBLIC_ADMOB_BANNER_IOS: ${{ secrets.EXPO_PUBLIC_ADMOB_BANNER_IOS }}
           EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS: ${{ secrets.EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_PATH: /tmp/asc-key.p8
+          EXPO_ASC_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          EXPO_ASC_API_KEY_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          EXPO_ASC_API_KEY_PATH: /tmp/asc-key.p8
       - name: Submit to App Store
         if: github.event.inputs.submit == 'true'
         run: eas submit --platform ios --latest --non-interactive
         env:
-          EXPO_PUBLIC_ANTHROPIC_API_KEY: ${{ secrets.EXPO_PUBLIC_ANTHROPIC_API_KEY }}
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_PATH: /tmp/asc-key.p8
+          EXPO_ASC_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          EXPO_ASC_API_KEY_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          EXPO_ASC_API_KEY_PATH: /tmp/asc-key.p8
