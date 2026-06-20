@@ -40,7 +40,6 @@
     "plugins": [
       "expo-router",
       "./plugins/withPrivacyManifest",
-      "./plugins/withHealthKit",
       "./plugins/withSignInWithApple",
       "expo-apple-authentication",
       [

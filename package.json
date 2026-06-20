@@ -25,7 +25,6 @@
     "react": "19.2.3",
     "react-native": "0.85.3",
     "react-native-google-mobile-ads": "^16.3.4",
-    "react-native-health": "^1.19.0",
     "react-native-iap": "^15.3.2",
     "react-native-nitro-modules": "^0.35.9",
     "react-native-reanimated": "^4.4.1",
