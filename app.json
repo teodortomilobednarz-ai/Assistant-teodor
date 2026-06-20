@@ -16,7 +16,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.nutrascan.app",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "Nutrascan utilise cet identifiant pour vous afficher des publicités pertinentes. Vous pouvez refuser sans impact sur les fonctionnalités de l'app."
+        "NSUserTrackingUsageDescription": "Nutrascan utilise cet identifiant pour vous afficher des publicités pertinentes. Vous pouvez refuser sans impact sur les fonctionnalités de l'app.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
