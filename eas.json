@@ -27,7 +27,10 @@
       "ios": {
         "appleId": "Tomiloteodor2@gmail.com",
         "ascAppId": "6782119151",
-        "appleTeamId": "QGC7BUJ5JG"
+        "appleTeamId": "QGC7BUJ5JG",
+        "ascApiKeyId": "2CBHWU88P9",
+        "ascApiKeyIssuerId": "78b2e274-e5ac-402b-8852-75ca575ccf3c",
+        "ascApiKeyPath": "/tmp/asc-key.p8"
       },
       "android": {
         "serviceAccountKeyPath": "./google-play-service-account.json",
