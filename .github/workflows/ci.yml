@@ -112,7 +112,20 @@ jobs:
           )
           hdrs = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-          # ── 4. Create iOS Distribution Certificate ────────────────────────────
+          # ── 4. Revoke existing iOS Distribution Certificates ─────────────────
+          resp = requests.get(
+              "https://api.appstoreconnect.apple.com/v1/certificates"
+              "?filter[certificateType]=IOS_DISTRIBUTION&limit=20",
+              headers=hdrs
+          )
+          for old_cert in resp.json().get("data", []):
+              del_resp = requests.delete(
+                  f"https://api.appstoreconnect.apple.com/v1/certificates/{old_cert['id']}",
+                  headers=hdrs
+              )
+              print(f"  Revoked old certificate {old_cert['id']} ({del_resp.status_code})")
+
+          # ── 5. Create fresh iOS Distribution Certificate ──────────────────────
           resp = requests.post(
               "https://api.appstoreconnect.apple.com/v1/certificates",
               headers=hdrs,
@@ -138,7 +151,7 @@ jobs:
           ], check=True)
           print(f"✓ Certificate created  id={cert_id}")
 
-          # ── 5. Look up bundle ID ──────────────────────────────────────────────
+          # ── 6. Look up bundle ID ──────────────────────────────────────────────
           resp = requests.get(
               "https://api.appstoreconnect.apple.com/v1/bundleIds"
               "?filter[identifier]=com.nutrascan.app&filter[platform]=IOS",
@@ -154,7 +167,7 @@ jobs:
           bundle_id = bundles[0]["id"]
           print(f"✓ Bundle ID found  id={bundle_id}")
 
-          # ── 6. Delete stale provisioning profiles with same name ──────────────
+          # ── 7. Delete stale provisioning profiles with same name ──────────────
           prof_name = "Nutrascan App Store CI"
           resp = requests.get(
               f"https://api.appstoreconnect.apple.com/v1/profiles"
@@ -168,7 +181,7 @@ jobs:
               )
               print(f"  Deleted stale profile {old['id']}")
 
-          # ── 7. Create App Store provisioning profile ──────────────────────────
+          # ── 8. Create App Store provisioning profile ──────────────────────────
           resp = requests.post(
               "https://api.appstoreconnect.apple.com/v1/profiles",
               headers=hdrs,
@@ -191,7 +204,7 @@ jobs:
               f.write(profile_bytes)
           print(f"✓ Provisioning profile created  id={profile_data['id']}")
 
-          # ── 8. Export P12 ─────────────────────────────────────────────────────
+          # ── 9. Export P12 ─────────────────────────────────────────────────────
           p12_pass = "nutrascan_ci_2024"
           subprocess.run([
               "openssl", "pkcs12", "-export",
@@ -203,7 +216,7 @@ jobs:
           ], check=True)
           print("✓ P12 created")
 
-          # ── 9. Write credentials.json ─────────────────────────────────────────
+          # ── 10. Write credentials.json ────────────────────────────────────────
           creds = {
               "ios": {
                   "provisioningProfilePath": "/tmp/nutrascan.mobileprovision",
