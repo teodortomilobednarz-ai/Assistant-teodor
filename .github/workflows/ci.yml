@@ -55,12 +55,182 @@ jobs:
           expo-version: latest
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Python deps for ASC API
+        run: pip install PyJWT cryptography requests
+
+      - name: Setup iOS credentials via ASC API
+        env:
+          IOS_DISTRIBUTION_KEY: ${{ secrets.IOS_DISTRIBUTION_KEY }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          python3 << 'PYEOF'
+          import base64, json, os, subprocess, sys, time
+
+          import jwt
+          import requests
+
+          # ── 1. Restore private key ────────────────────────────────────────────
+          key_b64 = os.environ["IOS_DISTRIBUTION_KEY"]
+          key_pem = base64.b64decode(key_b64).decode()
+          with open("/tmp/distribution.key", "w") as f:
+              f.write(key_pem)
+          os.chmod("/tmp/distribution.key", 0o600)
+          print("✓ Private key restored")
+
+          # ── 2. Generate CSR ───────────────────────────────────────────────────
+          subprocess.run([
+              "openssl", "req", "-new",
+              "-key", "/tmp/distribution.key",
+              "-subj", "/CN=Teodor Tomilo/O=Teodor Tomilo/C=FR/emailAddress=Tomiloteodor2@gmail.com",
+              "-out", "/tmp/distribution.csr"
+          ], check=True)
+          # Convert CSR to DER then base64 for Apple API
+          subprocess.run([
+              "openssl", "req",
+              "-in", "/tmp/distribution.csr",
+              "-outform", "DER",
+              "-out", "/tmp/distribution.csr.der"
+          ], check=True)
+          with open("/tmp/distribution.csr.der", "rb") as f:
+              csr_b64 = base64.b64encode(f.read()).decode()
+          print("✓ CSR generated")
+
+          # ── 3. Build ASC JWT ──────────────────────────────────────────────────
+          asc_key_id    = os.environ["ASC_KEY_ID"]
+          asc_issuer_id = os.environ["ASC_ISSUER_ID"]
+          asc_key_pem   = os.environ["ASC_PRIVATE_KEY"]
+
+          now = int(time.time())
+          token = jwt.encode(
+              {"iss": asc_issuer_id, "iat": now, "exp": now + 1200, "aud": "appstoreconnect-v1"},
+              asc_key_pem,
+              algorithm="ES256",
+              headers={"kid": asc_key_id}
+          )
+          hdrs = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+          # ── 4. Create iOS Distribution Certificate ────────────────────────────
+          resp = requests.post(
+              "https://api.appstoreconnect.apple.com/v1/certificates",
+              headers=hdrs,
+              json={"data": {"type": "certificates", "attributes": {
+                  "certificateType": "IOS_DISTRIBUTION",
+                  "csrContent": csr_b64
+              }}}
+          )
+          if not resp.ok:
+              print("Certificate API error:", resp.status_code, resp.text)
+              sys.exit(1)
+
+          cert_data    = resp.json()["data"]
+          cert_id      = cert_data["id"]
+          cert_content = cert_data["attributes"]["certificateContent"]
+          cert_der     = base64.b64decode(cert_content)
+          with open("/tmp/distribution.cer", "wb") as f:
+              f.write(cert_der)
+          subprocess.run([
+              "openssl", "x509", "-inform", "DER",
+              "-in", "/tmp/distribution.cer",
+              "-out", "/tmp/distribution.pem"
+          ], check=True)
+          print(f"✓ Certificate created  id={cert_id}")
+
+          # ── 5. Look up bundle ID ──────────────────────────────────────────────
+          resp = requests.get(
+              "https://api.appstoreconnect.apple.com/v1/bundleIds"
+              "?filter[identifier]=com.nutrascan.app&filter[platform]=IOS",
+              headers=hdrs
+          )
+          if not resp.ok:
+              print("BundleIds API error:", resp.status_code, resp.text)
+              sys.exit(1)
+          bundles = resp.json().get("data", [])
+          if not bundles:
+              print("ERROR: bundle ID com.nutrascan.app not found in Apple Developer account")
+              sys.exit(1)
+          bundle_id = bundles[0]["id"]
+          print(f"✓ Bundle ID found  id={bundle_id}")
+
+          # ── 6. Delete stale provisioning profiles with same name ──────────────
+          prof_name = "Nutrascan App Store CI"
+          resp = requests.get(
+              f"https://api.appstoreconnect.apple.com/v1/profiles"
+              f"?filter[name]={prof_name.replace(' ', '%20')}&filter[profileType]=IOS_APP_STORE",
+              headers=hdrs
+          )
+          for old in resp.json().get("data", []):
+              requests.delete(
+                  f"https://api.appstoreconnect.apple.com/v1/profiles/{old['id']}",
+                  headers=hdrs
+              )
+              print(f"  Deleted stale profile {old['id']}")
+
+          # ── 7. Create App Store provisioning profile ──────────────────────────
+          resp = requests.post(
+              "https://api.appstoreconnect.apple.com/v1/profiles",
+              headers=hdrs,
+              json={"data": {"type": "profiles", "attributes": {
+                  "name": prof_name,
+                  "profileType": "IOS_APP_STORE"
+              }, "relationships": {
+                  "bundleId":    {"data": {"type": "bundleIds",    "id": bundle_id}},
+                  "certificates": {"data": [{"type": "certificates", "id": cert_id}]},
+                  "devices":     {"data": []}
+              }}}
+          )
+          if not resp.ok:
+              print("Profile API error:", resp.status_code, resp.text)
+              sys.exit(1)
+          profile_data    = resp.json()["data"]
+          profile_content = profile_data["attributes"]["profileContent"]
+          profile_bytes   = base64.b64decode(profile_content)
+          with open("/tmp/nutrascan.mobileprovision", "wb") as f:
+              f.write(profile_bytes)
+          print(f"✓ Provisioning profile created  id={profile_data['id']}")
+
+          # ── 8. Export P12 ─────────────────────────────────────────────────────
+          p12_pass = "nutrascan_ci_2024"
+          subprocess.run([
+              "openssl", "pkcs12", "-export",
+              "-out",    "/tmp/distribution.p12",
+              "-inkey",  "/tmp/distribution.key",
+              "-in",     "/tmp/distribution.pem",
+              "-passout", f"pass:{p12_pass}",
+              "-legacy"
+          ], check=True)
+          print("✓ P12 created")
+
+          # ── 9. Write credentials.json ─────────────────────────────────────────
+          creds = {
+              "ios": {
+                  "provisioningProfilePath": "/tmp/nutrascan.mobileprovision",
+                  "distributionCertificate": {
+                      "path":     "/tmp/distribution.p12",
+                      "password": p12_pass
+                  }
+              }
+          }
+          with open("credentials.json", "w") as f:
+              json.dump(creds, f, indent=2)
+          print("✓ credentials.json written")
+          print("🎉 iOS credentials setup complete")
+          PYEOF
+
       - name: Write ASC API Key
         run: printf '%s' "$ASC_PRIVATE_KEY" > /tmp/asc-key.p8
         env:
           ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
-      - name: Build iOS production
-        run: eas build --platform ios --profile ${{ github.event.inputs.profile }} --non-interactive
+
+      - name: Build iOS
+        run: |
+          eas build \
+            --platform ios \
+            --profile ${{ github.event.inputs.profile }} \
+            --non-interactive \
+            --credentials-source local
         env:
           EXPO_PUBLIC_ANTHROPIC_API_KEY: ${{ secrets.EXPO_PUBLIC_ANTHROPIC_API_KEY }}
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
@@ -71,6 +241,7 @@ jobs:
           EXPO_ASC_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           EXPO_ASC_API_KEY_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           EXPO_ASC_API_KEY_PATH: /tmp/asc-key.p8
+
       - name: Submit to App Store
         if: github.event.inputs.submit == 'true'
         run: eas submit --platform ios --latest --non-interactive
