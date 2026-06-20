@@ -7,12 +7,7 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": { "resourceClass": "m-medium" },
-      "env": {
-        "EXPO_PUBLIC_ANTHROPIC_API_KEY": "",
-        "EXPO_PUBLIC_SUPABASE_URL": "",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": ""
-      }
+      "ios": { "resourceClass": "m-medium" }
     },
     "preview": {
       "distribution": "internal",
